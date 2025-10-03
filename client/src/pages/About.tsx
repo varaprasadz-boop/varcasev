@@ -28,18 +28,19 @@ const values = [
   },
 ];
 
-const leadershipTeam = [
-  {
-    name: "Ram Vemireddy",
-    role: "Founder & CEO",
-    image: teamImage,
-    bio: "Two decades of experience in Information Security and Compliance management for leading companies in the USA. Transitioning into the automotive industry in 2018, he spearheads Varcas with a commitment to sustainability.",
-  },
+const ceo = {
+  name: "Ram Vemireddy",
+  role: "Founder & CEO",
+  image: teamImage,
+  bio: "Two decades of experience in Information Security and Compliance management for leading companies in the USA. Transitioning into the automotive industry in 2018, he spearheads Varcas with a commitment to sustainability.",
+};
+
+const executives = [
   {
     name: "Chenna Reddy",
     role: "Finance Head",
     image: teamImage,
-    bio: "Oversees all financial operations, ensuring effective planning, control, and reporting. Plays a key role in driving financial strategy, maintaining compliance, and supporting the company's overall growth and stability.",
+    bio: "Oversees all financial operations, ensuring effective planning, control, and reporting. Plays a key role in driving financial strategy, maintaining compliance, and supporting the company's overall growth.",
   },
   {
     name: "LN Rao",
@@ -51,19 +52,76 @@ const leadershipTeam = [
     name: "Y. Suresh Reddy",
     role: "Executive Director",
     image: teamImage,
-    bio: "As Production Head, plays a key leadership role in overseeing core operations and driving organizational development. Works closely with the production department to ensure operational efficiency, uphold quality standards, and guarantee timely execution.",
+    bio: "As Production Head, plays a key leadership role in overseeing core operations and driving organizational development to ensure operational efficiency and quality standards.",
   },
+  {
+    name: "Venu Gopal Reddy",
+    role: "Executive Director (Kadapa)",
+    image: teamImage,
+    bio: "Oversees the company's Kadapa operations, driving growth, fostering customer relationships, and championing sustainability initiatives in the electric vehicle sector.",
+  },
+];
+
+const advisors = [
   {
     name: "Mr. A C Keshava Reddy",
     role: "Advisory Board Member",
     image: teamImage,
-    bio: "Mechanical engineer with vast experience across Asia in telecom, power, automobile, and government sectors. Active in the EV space since 2008, worked on innovative technologies and collaborated with the Ministry of Environment on pollution-reduction policies.",
+    bio: "Mechanical engineer with vast experience across Asia in telecom, power, automobile, and government sectors. Active in the EV space since 2008, collaborated with the Ministry of Environment on pollution-reduction policies.",
   },
   {
     name: "Mr. Sridhar Ramani",
     role: "Director/Chief Mentor",
     image: teamImage,
-    bio: "Board Member and Advisor with extensive experience in technology and business strategy, providing valuable guidance to the leadership team. His insights play a key role in driving growth and innovation in the electric mobility space.",
+    bio: "Board Member and Advisor with extensive experience in technology and business strategy, providing valuable guidance to the leadership team in driving growth and innovation.",
+  },
+];
+
+const managers = [
+  {
+    name: "K. Chandu",
+    role: "Production Manager",
+    image: teamImage,
+    bio: "Leads production at Varcas Automobiles, managing assembly processes, upholding quality standards, and advancing the company's mission for reliable electric vehicles.",
+  },
+  {
+    name: "S. Madhu",
+    role: "R&D & Sourcing Manager",
+    image: teamImage,
+    bio: "Drives research and development initiatives while managing sourcing operations to ensure quality components and innovative solutions for VARCAS vehicles.",
+  },
+  {
+    name: "Hari Prakash",
+    role: "Stores, Spare Parts & Customer Support Manager",
+    image: teamImage,
+    bio: "Manages stores, spare parts sales, warranty services, and customer support operations, ensuring excellent after-sales service and customer satisfaction.",
+  },
+];
+
+const teamMembers = [
+  {
+    name: "Syda Rao",
+    role: "Accounts Department",
+    image: teamImage,
+    bio: "Manages accounting operations and financial records, supporting the finance team in maintaining accurate financial documentation.",
+  },
+  {
+    name: "J. Gangadhar",
+    role: "Production Department",
+    image: teamImage,
+    bio: "Key member of the production team, contributing to manufacturing excellence and quality control processes.",
+  },
+  {
+    name: "Mahesh",
+    role: "Production Department",
+    image: teamImage,
+    bio: "Supports production operations, ensuring smooth manufacturing processes and adherence to quality standards.",
+  },
+  {
+    name: "B. Naveen",
+    role: "Warranty & Customer Support",
+    image: teamImage,
+    bio: "Provides warranty services and customer support, ensuring customer satisfaction and addressing service needs efficiently.",
   },
 ];
 
@@ -132,26 +190,124 @@ export default function About() {
           </div>
 
           <div className="mb-16">
-            <h2 className="text-3xl font-bold mb-8 text-center">Leadership Team</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {leadershipTeam.map((leader) => (
-                <Card key={leader.name} className="overflow-hidden hover-elevate transition-all" data-testid={`card-leader-${leader.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6">
-                    <div className="sm:col-span-1">
+            <h2 className="text-3xl font-bold mb-12 text-center">Leadership Team</h2>
+            
+            {/* CEO - Center, Large */}
+            <div className="max-w-4xl mx-auto mb-16">
+              <Card className="overflow-hidden hover-elevate transition-all border-2 border-primary/20" data-testid="card-ceo">
+                <div className="p-8">
+                  <div className="flex flex-col md:flex-row gap-8 items-center">
+                    <div className="w-48 h-48 flex-shrink-0">
                       <img
-                        src={leader.image}
-                        alt={leader.name}
-                        className="w-full aspect-square object-cover rounded-md"
+                        src={ceo.image}
+                        alt={ceo.name}
+                        className="w-full h-full object-cover rounded-md"
                       />
                     </div>
-                    <div className="sm:col-span-2 flex flex-col justify-center">
-                      <h3 className="text-xl font-bold mb-1">{leader.name}</h3>
-                      <p className="text-primary font-semibold mb-3">{leader.role}</p>
-                      <p className="text-muted-foreground text-sm">{leader.bio}</p>
+                    <div className="flex-1 text-center md:text-left">
+                      <h3 className="text-3xl font-bold mb-2">{ceo.name}</h3>
+                      <p className="text-primary font-semibold text-xl mb-4">{ceo.role}</p>
+                      <p className="text-muted-foreground">{ceo.bio}</p>
                     </div>
                   </div>
-                </Card>
-              ))}
+                </div>
+              </Card>
+            </div>
+
+            {/* Executives - Second Level */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-bold mb-6 text-center text-muted-foreground">Executive Leadership</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {executives.map((executive) => (
+                  <Card key={executive.name} className="overflow-hidden hover-elevate transition-all" data-testid={`card-executive-${executive.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6">
+                      <div className="sm:col-span-1">
+                        <img
+                          src={executive.image}
+                          alt={executive.name}
+                          className="w-full aspect-square object-cover rounded-md"
+                        />
+                      </div>
+                      <div className="sm:col-span-2 flex flex-col justify-center">
+                        <h4 className="text-xl font-bold mb-1">{executive.name}</h4>
+                        <p className="text-primary font-semibold mb-3">{executive.role}</p>
+                        <p className="text-muted-foreground text-sm">{executive.bio}</p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Advisors */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-bold mb-6 text-center text-muted-foreground">Advisory Board</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {advisors.map((advisor) => (
+                  <Card key={advisor.name} className="overflow-hidden hover-elevate transition-all" data-testid={`card-advisor-${advisor.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6">
+                      <div className="sm:col-span-1">
+                        <img
+                          src={advisor.image}
+                          alt={advisor.name}
+                          className="w-full aspect-square object-cover rounded-md"
+                        />
+                      </div>
+                      <div className="sm:col-span-2 flex flex-col justify-center">
+                        <h4 className="text-xl font-bold mb-1">{advisor.name}</h4>
+                        <p className="text-primary font-semibold mb-3">{advisor.role}</p>
+                        <p className="text-muted-foreground text-sm">{advisor.bio}</p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Managers */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-bold mb-6 text-center text-muted-foreground">Management Team</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {managers.map((manager) => (
+                  <Card key={manager.name} className="overflow-hidden hover-elevate transition-all" data-testid={`card-manager-${manager.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <div className="p-6">
+                      <div className="mb-4">
+                        <img
+                          src={manager.image}
+                          alt={manager.name}
+                          className="w-full aspect-square object-cover rounded-md"
+                        />
+                      </div>
+                      <h4 className="text-lg font-bold mb-1">{manager.name}</h4>
+                      <p className="text-primary font-semibold text-sm mb-3">{manager.role}</p>
+                      <p className="text-muted-foreground text-sm">{manager.bio}</p>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Team Members */}
+            <div>
+              <h3 className="text-2xl font-bold mb-6 text-center text-muted-foreground">Team Members</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {teamMembers.map((member) => (
+                  <Card key={member.name} className="overflow-hidden hover-elevate transition-all" data-testid={`card-member-${member.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <div className="p-6">
+                      <div className="mb-4">
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full aspect-square object-cover rounded-md"
+                        />
+                      </div>
+                      <h4 className="text-lg font-bold mb-1">{member.name}</h4>
+                      <p className="text-primary font-semibold text-sm mb-3">{member.role}</p>
+                      <p className="text-muted-foreground text-xs">{member.bio}</p>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
 
