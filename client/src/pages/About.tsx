@@ -193,11 +193,11 @@ export default function About() {
             <h2 className="text-3xl font-bold mb-12 text-center">Leadership Team</h2>
             
             {/* CEO - Center, Large */}
-            <div className="max-w-4xl mx-auto mb-16">
-              <Card className="overflow-hidden hover-elevate transition-all border-2 border-primary/20" data-testid="card-ceo">
-                <div className="p-8">
-                  <div className="flex flex-col md:flex-row gap-8 items-center">
-                    <div className="w-48 h-48 flex-shrink-0">
+            <div className="max-w-5xl mx-auto mb-20">
+              <Card className="overflow-hidden hover-elevate transition-all border-2 border-primary/20 shadow-lg" data-testid="card-ceo">
+                <div className="p-10 md:p-12">
+                  <div className="flex flex-col md:flex-row gap-10 items-center">
+                    <div className="w-64 h-64 flex-shrink-0">
                       <img
                         src={ceo.image}
                         alt={ceo.name}
@@ -205,9 +205,9 @@ export default function About() {
                       />
                     </div>
                     <div className="flex-1 text-center md:text-left">
-                      <h3 className="text-3xl font-bold mb-2">{ceo.name}</h3>
-                      <p className="text-primary font-semibold text-xl mb-4">{ceo.role}</p>
-                      <p className="text-muted-foreground">{ceo.bio}</p>
+                      <h3 className="text-4xl font-bold mb-3">{ceo.name}</h3>
+                      <p className="text-primary font-semibold text-2xl mb-6">{ceo.role}</p>
+                      <p className="text-muted-foreground text-lg leading-relaxed">{ceo.bio}</p>
                     </div>
                   </div>
                 </div>
@@ -267,20 +267,22 @@ export default function About() {
             {/* Managers */}
             <div className="mb-12">
               <h3 className="text-2xl font-bold mb-6 text-center text-muted-foreground">Management Team</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {managers.map((manager) => (
                   <Card key={manager.name} className="overflow-hidden hover-elevate transition-all" data-testid={`card-manager-${manager.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <div className="p-6">
-                      <div className="mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6">
+                      <div className="sm:col-span-1">
                         <img
                           src={manager.image}
                           alt={manager.name}
                           className="w-full aspect-square object-cover rounded-md"
                         />
                       </div>
-                      <h4 className="text-lg font-bold mb-1">{manager.name}</h4>
-                      <p className="text-primary font-semibold text-sm mb-3">{manager.role}</p>
-                      <p className="text-muted-foreground text-sm">{manager.bio}</p>
+                      <div className="sm:col-span-2 flex flex-col justify-center">
+                        <h4 className="text-xl font-bold mb-1">{manager.name}</h4>
+                        <p className="text-primary font-semibold mb-3">{manager.role}</p>
+                        <p className="text-muted-foreground text-sm">{manager.bio}</p>
+                      </div>
                     </div>
                   </Card>
                 ))}
