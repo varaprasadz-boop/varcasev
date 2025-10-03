@@ -47,8 +47,10 @@ export default function VehicleDetail() {
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <Badge className="mb-4" data-testid="badge-available">Available Now</Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">{vehicle.name}</h1>
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <h1 className="text-4xl md:text-6xl font-bold">{vehicle.name}</h1>
+              <Badge data-testid="badge-available">Available Now</Badge>
+            </div>
             <p className="text-2xl text-primary font-semibold mb-2">{vehicle.tagline}</p>
             <p className="text-lg text-muted-foreground max-w-3xl">
               {vehicle.description}
