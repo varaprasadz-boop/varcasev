@@ -3,7 +3,7 @@ import Footer from "@/components/Footer";
 import PartnershipDialog from "@/components/PartnershipDialog";
 import { Card } from "@/components/ui/card";
 import { Handshake, Globe, Target, TrendingUp } from "lucide-react";
-import prevalanceLogo from "@assets/JV Logo Final_1759481419156.pdf";
+import prevalanceLogo from "@assets/JV Logo Final-1_1759483242237.png";
 
 const partners = [
   {
