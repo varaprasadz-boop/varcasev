@@ -33,8 +33,9 @@ export default function Navigation() {
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" data-testid="link-home">
+          <Link href="/" data-testid="link-home" className="flex items-center gap-3">
             <img src={varcasLogo} alt="VARCAS" className="h-12 w-12" />
+            <span className="text-2xl font-bold text-foreground">VARCASEV</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
