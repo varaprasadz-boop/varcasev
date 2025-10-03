@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import heroImage1 from "@assets/stock_images/modern_electric_scoo_3eb5867d.jpg";
-import heroImage2 from "@assets/stock_images/modern_electric_scoo_e0eada63.jpg";
-import heroImage3 from "@assets/stock_images/modern_electric_scoo_deb76e81.jpg";
+import heroImage1 from "@assets/Gemini_Generated_Image_4jzcos4jzcos4jzc_1759490673763.png";
+import heroImage2 from "@assets/Gemini_Generated_Image_qk9odzqk9odzqk9o_1759490673764.png";
+import heroImage3 from "@assets/Gemini_Generated_Image_w9nnm2w9nnm2w9nn_1759490673764.png";
 
 const heroSlides = [
   {
