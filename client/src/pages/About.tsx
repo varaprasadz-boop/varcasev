@@ -30,28 +30,40 @@ const values = [
 
 const leadershipTeam = [
   {
-    name: "Rajesh Kumar",
-    role: "CEO & Founder",
+    name: "Ram Vemireddy",
+    role: "Founder & CEO",
     image: teamImage,
-    bio: "20+ years in automotive innovation, driving VARCAS's vision for sustainable mobility",
+    bio: "Two decades of experience in Information Security and Compliance management for leading companies in the USA. Transitioning into the automotive industry in 2018, he spearheads Varcas with a commitment to sustainability.",
   },
   {
-    name: "Priya Sharma",
-    role: "CTO",
+    name: "Chenna Reddy",
+    role: "Finance Head",
     image: teamImage,
-    bio: "Technology expert with extensive experience in electric vehicle systems and IoT",
+    bio: "Oversees all financial operations, ensuring effective planning, control, and reporting. Plays a key role in driving financial strategy, maintaining compliance, and supporting the company's overall growth and stability.",
   },
   {
-    name: "Michael Chen",
-    role: "VP Operations",
+    name: "LN Rao",
+    role: "COO",
     image: teamImage,
-    bio: "Global operations specialist ensuring quality and efficiency across markets",
+    bio: "As Chief Operating Officer, ensures smooth execution of business operations, streamlining processes and driving efficiency across departments to align with the company's strategic goals.",
   },
   {
-    name: "Anita Desai",
-    role: "Head of Design",
+    name: "Y. Suresh Reddy",
+    role: "Executive Director",
     image: teamImage,
-    bio: "Award-winning designer bringing innovation and aesthetics to every VARCAS model",
+    bio: "As Production Head, plays a key leadership role in overseeing core operations and driving organizational development. Works closely with the production department to ensure operational efficiency, uphold quality standards, and guarantee timely execution.",
+  },
+  {
+    name: "Mr. A C Keshava Reddy",
+    role: "Advisory Board Member",
+    image: teamImage,
+    bio: "Mechanical engineer with vast experience across Asia in telecom, power, automobile, and government sectors. Active in the EV space since 2008, worked on innovative technologies and collaborated with the Ministry of Environment on pollution-reduction policies.",
+  },
+  {
+    name: "Mr. Sridhar Ramani",
+    role: "Director/Chief Mentor",
+    image: teamImage,
+    bio: "Board Member and Advisor with extensive experience in technology and business strategy, providing valuable guidance to the leadership team. His insights play a key role in driving growth and innovation in the electric mobility space.",
   },
 ];
 
