@@ -6,9 +6,16 @@ import EnquiryDialog from "@/components/EnquiryDialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Bell, Navigation as NavIcon, Shield } from "lucide-react";
 import { vehicleDatabase } from "@/data/vehicleData";
 import NotFound from "@/pages/not-found";
+
+const featureIconMap: Record<string, any> = {
+  "Tracking": NavIcon,
+  "Reminders": Bell,
+  "Find My Bike": MapPin,
+  "Alerting": Shield,
+};
 
 export default function VehicleDetail() {
   const [, params] = useRoute("/vehicle/:slug");
@@ -93,36 +100,62 @@ export default function VehicleDetail() {
               </div>
             </div>
 
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Available Colors</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {vehicle.colors.map((color, index) => (
-                    <Card
-                      key={index}
-                      className={`p-4 cursor-pointer hover-elevate transition-all ${
-                        selectedColorIndex === index ? "ring-2 ring-primary" : ""
-                      }`}
-                      onClick={() => {
-                        setSelectedColorIndex(index);
-                        setSelectedImageIndex(2 + index);
-                      }}
-                      data-testid={`card-color-${index}`}
-                    >
-                      <div className="aspect-square mb-3 rounded-md overflow-hidden bg-white">
-                        <img
-                          src={color.image}
-                          alt={color.name}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <p className="text-sm font-medium text-center">{color.name}</p>
-                    </Card>
-                  ))}
+            <div className="flex flex-col h-full">
+              <div className="flex-1 space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold mb-6">Available Colors</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {vehicle.colors.map((color, index) => (
+                      <Card
+                        key={index}
+                        className={`p-4 cursor-pointer hover-elevate transition-all ${
+                          selectedColorIndex === index ? "ring-2 ring-primary" : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedColorIndex(index);
+                          setSelectedImageIndex(2 + index);
+                        }}
+                        data-testid={`card-color-${index}`}
+                      >
+                        <div className="aspect-square mb-3 rounded-md overflow-hidden bg-white">
+                          <img
+                            src={color.image}
+                            alt={color.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <p className="text-sm font-medium text-center">{color.name}</p>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h2 className="text-2xl font-bold mb-4">Key Highlights</h2>
+                  <Card className="p-6">
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">Battery Capacity: {vehicle.specifications.find(s => s.label === "Battery Capacity")?.value}</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">True Range: {vehicle.specifications.find(s => s.label === "True Range/Charge")?.value}</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">Charging Time: {vehicle.specifications.find(s => s.label === "Battery Charging Time")?.value}</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">Battery Type: {vehicle.specifications.find(s => s.label === "Battery Type")?.value}</span>
+                      </li>
+                    </ul>
+                  </Card>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 mt-6">
                 <EnquiryDialog trigger={
                   <Button
                     variant="default"
@@ -167,23 +200,22 @@ export default function VehicleDetail() {
             <div>
               <h2 className="text-3xl font-bold mb-8">Smart Features</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {vehicle.smartFeatures.map((feature, index) => (
-                  <Card key={index} className="p-6 hover-elevate transition-all" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <div className="flex items-start gap-6">
-                      <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-white">
-                        <img
-                          src={feature.icon}
-                          alt={feature.title}
-                          className="w-full h-full object-cover"
-                        />
+                {vehicle.smartFeatures.map((feature, index) => {
+                  const IconComponent = featureIconMap[feature.title] || NavIcon;
+                  return (
+                    <Card key={index} className="p-6 hover-elevate transition-all" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div className="flex items-start gap-6">
+                        <div className="w-16 h-16 flex-shrink-0 rounded-md bg-black flex items-center justify-center">
+                          <IconComponent className="w-8 h-8 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                          <p className="text-muted-foreground text-sm">{feature.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                        <p className="text-muted-foreground text-sm">{feature.description}</p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           )}
