@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import PartnershipDialog from "@/components/PartnershipDialog";
 import { Card } from "@/components/ui/card";
 import { Handshake, Globe, Target, TrendingUp } from "lucide-react";
+import prevalanceLogo from "@assets/JV Logo Final_1759481419156.pdf";
 
 const partners = [
   {
@@ -40,7 +41,7 @@ const partners = [
 const jointVentures = [
   {
     name: "Prevalance",
-    logo: "https://varcasautomobiles.com/images/laxmimoters.jpg",
+    logo: prevalanceLogo,
     description: "Joint venture for advanced electric mobility solutions and market expansion across emerging territories",
   },
 ];
