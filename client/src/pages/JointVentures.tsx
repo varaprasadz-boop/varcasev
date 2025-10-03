@@ -1,15 +1,48 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import PartnershipDialog from "@/components/PartnershipDialog";
 import { Card } from "@/components/ui/card";
 import { Handshake, Globe, Target, TrendingUp } from "lucide-react";
 
 const partners = [
-  { name: "Laxmi Motors", description: "Strategic distribution partner" },
-  { name: "Volta Technologies", description: "Battery technology collaboration" },
-  { name: "EVPE Solutions", description: "Charging infrastructure partner" },
-  { name: "Green Pioneer", description: "Sustainability initiatives" },
-  { name: "Bharath Seva", description: "Service network expansion" },
-  { name: "Hetros Innovation", description: "Technology development" },
+  {
+    name: "Laxmi Motors",
+    logo: "https://varcasautomobiles.com/images/laxmimoters.jpg",
+    description: "Strategic distribution partner for nationwide reach",
+  },
+  {
+    name: "Volta",
+    logo: "https://varcasautomobiles.com/images/partners/volta.png",
+    description: "Battery technology and charging solutions collaboration",
+  },
+  {
+    name: "EVPE",
+    logo: "https://varcasautomobiles.com/images/partners/evpe.svg",
+    description: "Electric vehicle component manufacturing partnership",
+  },
+  {
+    name: "Green Pioneer",
+    logo: "https://varcasautomobiles.com/images/partners/greenpoineer.png",
+    description: "Sustainability initiatives and eco-friendly solutions",
+  },
+  {
+    name: "Bharath Seva",
+    logo: "https://varcasautomobiles.com/images/partners/Bharathaseva.png",
+    description: "Service network expansion and after-sales support",
+  },
+  {
+    name: "Hetros",
+    logo: "https://varcasautomobiles.com/images/partners/hetros.png",
+    description: "Technology development and innovation partner",
+  },
+];
+
+const jointVentures = [
+  {
+    name: "Prevalance",
+    logo: "https://varcasautomobiles.com/images/laxmimoters.jpg",
+    description: "Joint venture for advanced electric mobility solutions and market expansion across emerging territories",
+  },
 ];
 
 const benefits = [
@@ -74,33 +107,54 @@ export default function JointVentures() {
             </div>
           </div>
 
-          <div>
-            <h2 className="text-3xl font-bold mb-8 text-center">Our Partners</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {partners.map((partner) => (
-                <Card key={partner.name} className="p-8 text-center hover-elevate transition-all" data-testid={`card-partner-${partner.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Handshake className="w-8 h-8 text-primary" />
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-8">Joint Ventures</h2>
+            <div className="grid grid-cols-1 gap-6">
+              {jointVentures.map((jv) => (
+                <Card key={jv.name} className="p-8 hover-elevate transition-all" data-testid={`card-jv-${jv.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="flex flex-col md:flex-row items-center gap-8">
+                    <div className="w-full md:w-48 h-48 bg-card flex items-center justify-center rounded-md p-6">
+                      <img
+                        src={jv.logo}
+                        alt={jv.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1 text-center md:text-left">
+                      <h3 className="text-2xl font-bold mb-3">{jv.name}</h3>
+                      <p className="text-muted-foreground text-lg">{jv.description}</p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{partner.name}</h3>
-                  <p className="text-sm text-muted-foreground">{partner.description}</p>
                 </Card>
               ))}
             </div>
           </div>
 
-          <Card className="mt-16 p-8 md:p-12 text-center bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-8">Our Strategic Partners</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {partners.map((partner) => (
+                <Card key={partner.name} className="p-6 hover-elevate transition-all" data-testid={`card-partner-${partner.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="h-32 flex items-center justify-center mb-4 bg-white rounded-md p-4">
+                    <img
+                      src={partner.logo}
+                      alt={partner.name}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-center">{partner.name}</h3>
+                  <p className="text-sm text-muted-foreground text-center">{partner.description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <Card className="p-8 md:p-12 text-center bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Interested in Partnering?</h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               We're always looking for strategic partners who can help us expand our reach and enhance our offerings. Get in touch to explore collaboration opportunities.
             </p>
-            <a
-              href="mailto:partnerships@varcasautomobiles.com"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-8"
-              data-testid="link-contact-partnership"
-            >
-              Contact Us for Partnerships
-            </a>
+            <PartnershipDialog />
           </Card>
         </div>
       </section>

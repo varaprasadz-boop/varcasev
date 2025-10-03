@@ -28,6 +28,33 @@ const values = [
   },
 ];
 
+const leadershipTeam = [
+  {
+    name: "Rajesh Kumar",
+    role: "CEO & Founder",
+    image: teamImage,
+    bio: "20+ years in automotive innovation, driving VARCAS's vision for sustainable mobility",
+  },
+  {
+    name: "Priya Sharma",
+    role: "CTO",
+    image: teamImage,
+    bio: "Technology expert with extensive experience in electric vehicle systems and IoT",
+  },
+  {
+    name: "Michael Chen",
+    role: "VP Operations",
+    image: teamImage,
+    bio: "Global operations specialist ensuring quality and efficiency across markets",
+  },
+  {
+    name: "Anita Desai",
+    role: "Head of Design",
+    image: teamImage,
+    bio: "Award-winning designer bringing innovation and aesthetics to every VARCAS model",
+  },
+];
+
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
@@ -89,6 +116,30 @@ export default function About() {
                   </div>
                 </Card>
               </div>
+            </div>
+          </div>
+
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-8 text-center">Leadership Team</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {leadershipTeam.map((leader) => (
+                <Card key={leader.name} className="overflow-hidden hover-elevate transition-all" data-testid={`card-leader-${leader.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6">
+                    <div className="sm:col-span-1">
+                      <img
+                        src={leader.image}
+                        alt={leader.name}
+                        className="w-full aspect-square object-cover rounded-md"
+                      />
+                    </div>
+                    <div className="sm:col-span-2 flex flex-col justify-center">
+                      <h3 className="text-xl font-bold mb-1">{leader.name}</h3>
+                      <p className="text-primary font-semibold mb-3">{leader.role}</p>
+                      <p className="text-muted-foreground text-sm">{leader.bio}</p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           </div>
 

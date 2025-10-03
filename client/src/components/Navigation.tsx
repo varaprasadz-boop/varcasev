@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import EnquiryDialog from "@/components/EnquiryDialog";
 import varcasLogo from "@assets/varcasev_1759475493203.png";
 
 export default function Navigation() {
@@ -75,9 +76,7 @@ export default function Navigation() {
               )}
             </div>
 
-            <Button variant="default" size="sm" data-testid="button-enquire-now">
-              Enquire Now
-            </Button>
+            <EnquiryDialog />
           </div>
 
           <button
@@ -124,9 +123,13 @@ export default function Navigation() {
               ))}
             </div>
 
-            <Button variant="default" className="w-full mt-4" data-testid="button-mobile-enquire">
-              Enquire Now
-            </Button>
+            <div className="mt-4">
+              <EnquiryDialog trigger={
+                <Button variant="default" className="w-full" data-testid="button-mobile-enquire">
+                  Enquire Now
+                </Button>
+              } />
+            </div>
           </div>
         </div>
       )}
