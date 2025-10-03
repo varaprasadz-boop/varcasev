@@ -50,7 +50,7 @@ export default function VehicleDetail() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
             <div>
-              <div className="relative mb-6 rounded-md overflow-hidden bg-card group">
+              <div className="relative mb-6 rounded-md overflow-hidden bg-white group">
                 <img
                   src={allImages[selectedImageIndex]}
                   alt={vehicle.name}
@@ -87,7 +87,7 @@ export default function VehicleDetail() {
                     }`}
                     data-testid={`button-thumbnail-${index}`}
                   >
-                    <img src={img} alt={`View ${index + 1}`} className="w-full h-20 object-contain bg-card" />
+                    <img src={img} alt={`View ${index + 1}`} className="w-full h-20 object-contain bg-white" />
                   </button>
                 ))}
               </div>
@@ -170,7 +170,7 @@ export default function VehicleDetail() {
                 {vehicle.smartFeatures.map((feature, index) => (
                   <Card key={index} className="p-6 hover-elevate transition-all" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
                     <div className="flex items-start gap-6">
-                      <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-card">
+                      <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-white">
                         <img
                           src={feature.icon}
                           alt={feature.title}
