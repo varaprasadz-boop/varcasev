@@ -23,6 +23,10 @@ export default function Navigation() {
     { name: "EAGAN", path: "/vehicle/eagan" },
     { name: "CRONY", path: "/vehicle/crony" },
     { name: "AMAN", path: "/vehicle/aman" },
+    { name: "RUBY", path: "/vehicle/ruby" },
+    { name: "TEJAS-SPORT", path: "/vehicle/tejas-sport" },
+    { name: "RANI-EX", path: "/vehicle/rani-ex" },
+    { name: "RANI-LX", path: "/vehicle/rani-lx" },
   ];
 
   return (
@@ -34,21 +38,25 @@ export default function Navigation() {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            {navigationLinks.map((link) => (
-              <Link
-                key={link.path}
-                href={link.path}
-                data-testid={`link-${link.name.toLowerCase().replace(/\s+/g, '-')}`}
+            <Link href="/" data-testid="link-home-nav">
+              <span
+                className={`text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
+                  location === "/" ? "text-primary" : "text-foreground"
+                }`}
               >
-                <span
-                  className={`text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
-                    location === link.path ? "text-primary" : "text-foreground"
-                  }`}
-                >
-                  {link.name}
-                </span>
-              </Link>
-            ))}
+                Home
+              </span>
+            </Link>
+
+            <Link href="/about" data-testid="link-about-us">
+              <span
+                className={`text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
+                  location === "/about" ? "text-primary" : "text-foreground"
+                }`}
+              >
+                About Us
+              </span>
+            </Link>
             
             <div
               className="relative"
@@ -75,6 +83,36 @@ export default function Navigation() {
                 </div>
               )}
             </div>
+
+            <Link href="/joint-ventures" data-testid="link-joint-ventures">
+              <span
+                className={`text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
+                  location === "/joint-ventures" ? "text-primary" : "text-foreground"
+                }`}
+              >
+                Joint Ventures
+              </span>
+            </Link>
+
+            <Link href="/find-dealer" data-testid="link-find-a-dealer">
+              <span
+                className={`text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
+                  location === "/find-dealer" ? "text-primary" : "text-foreground"
+                }`}
+              >
+                Find a Dealer
+              </span>
+            </Link>
+
+            <Link href="/buy-spares" data-testid="link-buy-spares">
+              <span
+                className={`text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
+                  location === "/buy-spares" ? "text-primary" : "text-foreground"
+                }`}
+              >
+                Buy Spares
+              </span>
+            </Link>
 
             <EnquiryDialog />
           </div>

@@ -1,37 +1,61 @@
 import VehicleCard from "./VehicleCard";
-import vehicle1 from "@assets/stock_images/electric_scooter_pro_ed0c12d8.jpg";
-import vehicle2 from "@assets/stock_images/electric_scooter_pro_c96f7582.jpg";
-import vehicle3 from "@assets/stock_images/electric_scooter_pro_bdc85862.jpg";
-import vehicle4 from "@assets/stock_images/electric_scooter_pro_7cc39faa.jpg";
 
 const vehicles = [
   {
     name: "FALCON",
-    image: vehicle1,
-    range: "150 KM/Charge",
+    image: "https://varcasautomobiles.com/images/falcon_red.png",
+    range: "100 KM/Charge",
     battery: "Lithium-ION, 3 Year Warranty",
     link: "/vehicle/falcon",
   },
   {
     name: "EAGAN",
-    image: vehicle2,
-    range: "140 KM/Charge",
+    image: "https://varcasautomobiles.com/images/egan_prod.png",
+    range: "80-95 KM/Charge",
     battery: "Lithium-ION, 3 Year Warranty",
     link: "/vehicle/eagan",
   },
   {
     name: "CRONY",
-    image: vehicle3,
-    range: "130 KM/Charge",
+    image: "https://varcasautomobiles.com/images/cap-img-6.png",
+    range: "55 KM/Charge",
     battery: "Lithium-ION, 3 Year Warranty",
     link: "/vehicle/crony",
   },
   {
     name: "AMAN",
-    image: vehicle4,
-    range: "150 KM/Charge",
+    image: "https://varcasautomobiles.com/images/aman.png",
+    range: "80-95 KM/Charge",
     battery: "Lithium-ION, 3 Year Warranty",
     link: "/vehicle/aman",
+  },
+  {
+    name: "RUBY",
+    image: "https://varcasautomobiles.com/images/ruby.png",
+    range: "55 KM/Charge",
+    battery: "Lithium-ION, 3 Year Warranty",
+    link: "/vehicle/ruby",
+  },
+  {
+    name: "TEJAS-SPORT",
+    image: "https://varcasautomobiles.com/images/TEJA.png",
+    range: "Pedal Assist",
+    battery: "250W Motor, Shimano Gears",
+    link: "/vehicle/tejas-sport",
+  },
+  {
+    name: "RANI-EX",
+    image: "https://varcasautomobiles.com/images/rani.png",
+    range: "30 KM/Charge",
+    battery: "36V 12Ah, Front Basket",
+    link: "/vehicle/rani-ex",
+  },
+  {
+    name: "RANI-LX",
+    image: "https://varcasautomobiles.com/images/rani-lx.png",
+    range: "40 KM/Charge",
+    battery: "36V 12Ah, Rear Seat",
+    link: "/vehicle/rani-lx",
   },
 ];
 
@@ -48,7 +72,7 @@ export default function FeaturedVehicles() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {vehicles.map((vehicle) => (
             <VehicleCard key={vehicle.name} {...vehicle} />
           ))}

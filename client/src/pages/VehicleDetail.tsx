@@ -1,37 +1,37 @@
 import { useState } from "react";
+import { useRoute } from "wouter";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import EnquiryDialog from "@/components/EnquiryDialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Battery, Zap, Navigation as NavIcon, Gauge, Weight, Clock } from "lucide-react";
-import vehicleImage from "@assets/stock_images/electric_scooter_pro_ed0c12d8.jpg";
-
-const vehicleImages = [
-  vehicleImage,
-  vehicleImage,
-  vehicleImage,
-];
-
-const colors = [
-  { name: "Graphite Black", value: "#1a1a1a" },
-  { name: "Pearl White", value: "#f5f5f5" },
-  { name: "Ruby Red", value: "#dc2626" },
-  { name: "Golden Glow", value: "#eab308" },
-];
-
-const features = [
-  { icon: Zap, label: "Range", value: "150 KM/Charge" },
-  { icon: Battery, label: "Battery", value: "Lithium-ION, 3 Year Warranty" },
-  { icon: NavIcon, label: "Tracking", value: "GPS & GPRS Enabled" },
-  { icon: Gauge, label: "Top Speed", value: "45 km/h" },
-  { icon: Weight, label: "Weight", value: "85 kg" },
-  { icon: Clock, label: "Charging Time", value: "4-5 hours" },
-];
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { vehicleDatabase } from "@/data/vehicleData";
+import NotFound from "@/pages/not-found";
 
 export default function VehicleDetail() {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedColor, setSelectedColor] = useState(0);
+  const [, params] = useRoute("/vehicle/:slug");
+  const slug = params?.slug || "";
+  
+  const vehicle = vehicleDatabase[slug];
+  
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
+
+  if (!vehicle) {
+    return <NotFound />;
+  }
+
+  const allImages = [vehicle.mainImage, vehicle.frontImage, ...vehicle.colors.map(c => c.image)];
+
+  const nextImage = () => {
+    setSelectedImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setSelectedImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,209 +39,154 @@ export default function VehicleDetail() {
       
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <Badge className="mb-4" data-testid="badge-available">Available Now</Badge>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">{vehicle.name}</h1>
+            <p className="text-2xl text-primary font-semibold mb-2">{vehicle.tagline}</p>
+            <p className="text-lg text-muted-foreground max-w-3xl">
+              {vehicle.description}
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
             <div>
-              <div className="mb-4">
+              <div className="relative mb-6 rounded-md overflow-hidden bg-card group">
                 <img
-                  src={vehicleImages[selectedImage]}
-                  alt="FALCON"
-                  className="w-full h-96 object-cover rounded-md"
+                  src={allImages[selectedImageIndex]}
+                  alt={vehicle.name}
+                  className="w-full h-[500px] object-contain"
                 />
+                
+                {allImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      data-testid="button-prev-image"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      data-testid="button-next-image"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                {vehicleImages.map((img, index) => (
+
+              <div className="grid grid-cols-4 gap-3">
+                {allImages.slice(0, 4).map((img, index) => (
                   <button
                     key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`rounded-md overflow-hidden border-2 transition-colors ${
-                      selectedImage === index ? "border-primary" : "border-transparent"
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`rounded-md overflow-hidden border-2 transition-all hover-elevate ${
+                      selectedImageIndex === index ? "border-primary ring-2 ring-primary/20" : "border-border"
                     }`}
-                    data-testid={`button-image-${index}`}
+                    data-testid={`button-thumbnail-${index}`}
                   >
-                    <img src={img} alt={`View ${index + 1}`} className="w-full h-24 object-cover" />
+                    <img src={img} alt={`View ${index + 1}`} className="w-full h-20 object-contain bg-card" />
                   </button>
                 ))}
               </div>
             </div>
 
-            <div>
-              <Badge className="mb-4" data-testid="badge-available">Available Now</Badge>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">FALCON</h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Experience the future of urban commuting with the FALCON - our flagship smart & connected e-bike that seamlessly blends sleek design with advanced technology.
-              </p>
-
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4">Available Colors</h3>
-                <div className="flex gap-3">
-                  {colors.map((color, index) => (
-                    <button
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Available Colors</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {vehicle.colors.map((color, index) => (
+                    <Card
                       key={index}
-                      onClick={() => setSelectedColor(index)}
-                      className={`w-12 h-12 rounded-full border-2 transition-all hover-elevate ${
-                        selectedColor === index ? "border-primary ring-2 ring-primary/20" : "border-border"
+                      className={`p-4 cursor-pointer hover-elevate transition-all ${
+                        selectedColorIndex === index ? "ring-2 ring-primary" : ""
                       }`}
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                      data-testid={`button-color-${index}`}
-                    />
+                      onClick={() => {
+                        setSelectedColorIndex(index);
+                        setSelectedImageIndex(2 + index);
+                      }}
+                      data-testid={`card-color-${index}`}
+                    >
+                      <div className="aspect-square mb-3 rounded-md overflow-hidden bg-white">
+                        <img
+                          src={color.image}
+                          alt={color.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <p className="text-sm font-medium text-center">{color.name}</p>
+                    </Card>
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">{colors[selectedColor].name}</p>
               </div>
 
-              <Button
-                variant="default"
-                size="lg"
-                className="w-full mb-4"
-                data-testid="button-enquire-vehicle"
-                onClick={() => console.log('Open enquiry form')}
-              >
-                Enquire Now
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full"
-                data-testid="button-book-test-ride"
-                onClick={() => console.log('Book test ride')}
-              >
-                Book Test Ride
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-            <div className="lg:col-span-2">
-              <h2 className="text-3xl font-bold mb-6">Description</h2>
-              <div className="prose prose-invert max-w-none">
-                <p className="text-muted-foreground mb-4">
-                  The FALCON represents the pinnacle of electric mobility, combining cutting-edge technology with sustainable transportation. Designed for the modern commuter, it offers an unmatched riding experience with its powerful motor and intelligent features.
-                </p>
-                <p className="text-muted-foreground mb-4">
-                  Equipped with GPS and GPRS tracking, the FALCON ensures your peace of mind with real-time location updates and anti-theft alerts. The lithium-ion battery provides an impressive 150 km range on a single charge, making it perfect for daily commutes and longer journeys alike.
-                </p>
-                <p className="text-muted-foreground">
-                  With our Varcas Care Program, you get assured doorstep sales and after-sales support, ensuring your e-bike is always in top condition. Experience the future of sustainable transportation with the FALCON.
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Key Features</h2>
-              <div className="space-y-3">
-                {features.map((feature) => {
-                  const Icon = feature.icon;
-                  return (
-                    <Card key={feature.label} className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Icon className="w-5 h-5 text-primary flex-shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-sm text-muted-foreground">{feature.label}</p>
-                          <p className="font-semibold">{feature.value}</p>
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })}
+              <div className="space-y-4">
+                <EnquiryDialog trigger={
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full"
+                    data-testid="button-enquire-vehicle"
+                  >
+                    Enquire Now
+                  </Button>
+                } />
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  data-testid="button-book-test-ride"
+                >
+                  Book Test Ride
+                </Button>
               </div>
             </div>
           </div>
 
-          <div>
-            <h2 className="text-3xl font-bold mb-6">Technical Specifications</h2>
-            <Card className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-4 text-lg">Motor & Performance</h3>
-                  <dl className="space-y-3">
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Motor Type</dt>
-                      <dd className="font-medium">BLDC Hub Motor</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Motor Power</dt>
-                      <dd className="font-medium">250W</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Top Speed</dt>
-                      <dd className="font-medium">45 km/h</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Range</dt>
-                      <dd className="font-medium">150 KM/Charge</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-4 text-lg">Battery & Charging</h3>
-                  <dl className="space-y-3">
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Battery Type</dt>
-                      <dd className="font-medium">Lithium-ION</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Battery Warranty</dt>
-                      <dd className="font-medium">3 Years</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Charging Time</dt>
-                      <dd className="font-medium">4-5 hours</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Portable Battery</dt>
-                      <dd className="font-medium">Yes</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-4 text-lg">Smart Features</h3>
-                  <dl className="space-y-3">
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">GPS Tracking</dt>
-                      <dd className="font-medium">Yes</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">GPRS Enabled</dt>
-                      <dd className="font-medium">Yes</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Trip Tracking</dt>
-                      <dd className="font-medium">Yes</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Smart Alerts</dt>
-                      <dd className="font-medium">Yes</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-4 text-lg">Physical Specifications</h3>
-                  <dl className="space-y-3">
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Weight</dt>
-                      <dd className="font-medium">85 kg</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Load Capacity</dt>
-                      <dd className="font-medium">150 kg</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Brakes</dt>
-                      <dd className="font-medium">Disc Brakes (Front & Rear)</dd>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <dt className="text-muted-foreground">Warranty</dt>
-                      <dd className="font-medium">2 Years</dd>
-                    </div>
-                  </dl>
-                </div>
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-8">Technical Specifications</h2>
+            <Card className="p-6 md:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+                {vehicle.specifications.map((spec, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-start py-3 border-b border-border"
+                    data-testid={`spec-${spec.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <dt className="text-muted-foreground font-medium">{spec.label}</dt>
+                    <dd className="font-semibold text-right">{spec.value}</dd>
+                  </div>
+                ))}
               </div>
             </Card>
           </div>
+
+          {vehicle.smartFeatures.length > 0 && (
+            <div>
+              <h2 className="text-3xl font-bold mb-8">Smart Features</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {vehicle.smartFeatures.map((feature, index) => (
+                  <Card key={index} className="p-6 hover-elevate transition-all" data-testid={`feature-${feature.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <div className="flex items-start gap-6">
+                      <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-card">
+                        <img
+                          src={feature.icon}
+                          alt={feature.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                        <p className="text-muted-foreground text-sm">{feature.description}</p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

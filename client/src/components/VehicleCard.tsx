@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Battery, Zap, Navigation } from "lucide-react";
@@ -21,11 +22,11 @@ export default function VehicleCard({
 }: VehicleCardProps) {
   return (
     <Card className="overflow-hidden hover-elevate transition-all duration-300 group" data-testid={`card-vehicle-${name.toLowerCase()}`}>
-      <div className="aspect-[4/3] overflow-hidden bg-card">
+      <div className="aspect-[4/3] overflow-hidden bg-white">
         <img
           src={image}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
         />
       </div>
       <div className="p-6">
@@ -41,20 +42,21 @@ export default function VehicleCard({
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Navigation className="w-4 h-4 text-primary" />
-            <span>GPS & GPRS Tracking</span>
+            <span>Smart Features</span>
           </div>
         </div>
         {price && (
           <p className="text-lg font-semibold text-primary mb-4">{price}</p>
         )}
-        <Button
-          variant="default"
-          className="w-full"
-          data-testid={`button-know-more-${name.toLowerCase()}`}
-          onClick={() => console.log(`Navigate to ${link}`)}
-        >
-          Know More
-        </Button>
+        <Link href={link}>
+          <Button
+            variant="default"
+            className="w-full"
+            data-testid={`button-know-more-${name.toLowerCase()}`}
+          >
+            Know More
+          </Button>
+        </Link>
       </div>
     </Card>
   );
