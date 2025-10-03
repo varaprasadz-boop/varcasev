@@ -35,7 +35,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" data-testid="link-home" className="flex items-center gap-3">
             <img src={varcasLogo} alt="VARCAS" className="h-12 w-12" />
-            <span className="text-2xl font-bold text-foreground">VARCASEV</span>
+            <span className="text-2xl font-bold text-foreground">varcas-ev</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
