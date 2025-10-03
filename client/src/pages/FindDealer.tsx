@@ -159,31 +159,59 @@ export default function FindDealer() {
             </div>
 
             <div className="order-1 lg:order-2">
-              <h2 className="text-2xl font-bold mb-6">Coverage Map</h2>
-              <Card className="p-6 sticky top-24">
-                <div className="aspect-square bg-card rounded-md flex items-center justify-center relative overflow-hidden">
-                  <svg viewBox="0 0 400 500" className="w-full h-full text-primary/20" fill="currentColor">
-                    <path d="M 150 50 L 180 80 L 200 70 L 230 90 L 250 85 L 280 100 L 290 120 L 300 150 L 310 180 L 315 220 L 310 260 L 300 300 L 285 340 L 270 370 L 250 390 L 230 410 L 210 430 L 190 445 L 170 455 L 150 460 L 130 455 L 110 445 L 90 430 L 75 410 L 65 390 L 55 370 L 50 350 L 45 330 L 42 310 L 40 290 L 40 270 L 42 250 L 45 230 L 50 210 L 58 190 L 68 170 L 80 150 L 95 130 L 110 110 L 125 90 L 135 70 Z" />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="w-16 h-16 text-primary mx-auto mb-4" />
-                      <p className="text-xl font-bold mb-2">Pan-India Network</p>
-                      <p className="text-muted-foreground">250+ Service Centers</p>
-                      <p className="text-muted-foreground">400+ Sale Points</p>
+              <h2 className="text-2xl font-bold mb-6">Interactive Map</h2>
+              <Card className="p-0 sticky top-24 overflow-hidden">
+                <div className="aspect-[4/3] bg-gradient-to-br from-card to-muted relative border-2 border-dashed border-primary/30">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent via-background/50 to-background/80">
+                    <div className="text-center p-8">
+                      <MapPin className="w-20 h-20 text-primary mx-auto mb-6 animate-pulse" />
+                      <p className="text-2xl font-bold mb-3">Interactive India Map</p>
+                      <p className="text-lg text-muted-foreground mb-4">Google Maps Integration</p>
+                      <div className="bg-card/80 backdrop-blur-sm rounded-md p-4 border border-primary/20 max-w-sm mx-auto">
+                        <p className="text-sm text-muted-foreground mb-2">Will display:</p>
+                        <ul className="text-sm text-left space-y-1">
+                          <li className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                            <span>Dealer locations with pins</span>
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                            <span>Click for directions</span>
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                            <span>Zoom and pan controls</span>
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                            <span>Real-time navigation</span>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
+                  <svg viewBox="0 0 400 500" className="w-full h-full text-primary/10 absolute inset-0" fill="currentColor">
+                    <path d="M 150 50 L 180 80 L 200 70 L 230 90 L 250 85 L 280 100 L 290 120 L 300 150 L 310 180 L 315 220 L 310 260 L 300 300 L 285 340 L 270 370 L 250 390 L 230 410 L 210 430 L 190 445 L 170 455 L 150 460 L 130 455 L 110 445 L 90 430 L 75 410 L 65 390 L 55 370 L 50 350 L 45 330 L 42 310 L 40 290 L 40 270 L 42 250 L 45 230 L 50 210 L 58 190 L 68 170 L 80 150 L 95 130 L 110 110 L 125 90 L 135 70 Z" />
+                  </svg>
                 </div>
-                <div className="mt-6 space-y-2">
-                  <p className="text-sm text-muted-foreground text-center">
-                    VARCAS dealers are strategically located across major cities in India
+                <div className="p-6 bg-card">
+                  <p className="text-sm text-muted-foreground text-center mb-4">
+                    Interactive map will be integrated with Google Maps API in the final version
                   </p>
-                  <div className="flex flex-wrap gap-2 justify-center mt-4">
+                  <div className="flex flex-wrap gap-2 justify-center">
                     {Array.from(new Set(dealers.map(d => d.state))).map((state) => (
                       <span key={state} className="px-3 py-1 bg-primary/10 text-primary rounded-md text-sm">
                         {state}
                       </span>
                     ))}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-border text-center">
+                    <p className="text-sm font-semibold mb-1">Pan-India Coverage</p>
+                    <div className="flex gap-6 justify-center text-sm text-muted-foreground">
+                      <span>250+ Service Centers</span>
+                      <span>•</span>
+                      <span>400+ Sale Points</span>
+                    </div>
                   </div>
                 </div>
               </Card>
