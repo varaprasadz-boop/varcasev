@@ -127,7 +127,7 @@ export default function VehicleDetail() {
                   <Button
                     variant="default"
                     size="lg"
-                    className="w-full"
+                    className="w-full transition-all"
                     data-testid="button-enquire-vehicle"
                   >
                     Enquire Now
@@ -136,7 +136,7 @@ export default function VehicleDetail() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full"
+                  className="w-full transition-all"
                   data-testid="button-book-test-ride"
                 >
                   Book Test Ride
