@@ -6,6 +6,7 @@ import SmartFeatures from "@/components/SmartFeatures";
 import AboutPreview from "@/components/AboutPreview";
 import EnvironmentalImpact from "@/components/EnvironmentalImpact";
 import Testimonials from "@/components/Testimonials";
+import PressMediaSlider from "@/components/PressMediaSlider";
 import DealerCTA from "@/components/DealerCTA";
 import Footer from "@/components/Footer";
 
@@ -20,6 +21,7 @@ export default function Home() {
       <AboutPreview />
       <EnvironmentalImpact />
       <Testimonials />
+      <PressMediaSlider />
       <DealerCTA />
       <Footer />
     </div>
