@@ -53,6 +53,11 @@ export default function Footer() {
                   <span className="text-muted-foreground hover:text-primary cursor-pointer">Buy Spares</span>
                 </Link>
               </li>
+              <li>
+                <Link href="/careers">
+                  <span className="text-muted-foreground hover:text-primary cursor-pointer">Careers</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
