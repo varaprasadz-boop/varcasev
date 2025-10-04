@@ -72,21 +72,25 @@ export default function PressMediaSlider() {
             </div>
           </Card>
 
-          <button
+          <Button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground p-3 rounded-full shadow-lg transition-colors"
+            size="icon"
+            variant="outline"
+            className="absolute left-4 top-1/2 -translate-y-1/2 shadow-lg"
             data-testid="button-press-prev"
           >
             <ChevronLeft className="w-5 h-5" />
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground p-3 rounded-full shadow-lg transition-colors"
+            size="icon"
+            variant="outline"
+            className="absolute right-4 top-1/2 -translate-y-1/2 shadow-lg"
             data-testid="button-press-next"
           >
             <ChevronRight className="w-5 h-5" />
-          </button>
+          </Button>
 
           <div className="flex justify-center gap-2 mt-6">
             {pressArticles.map((_, index) => (
