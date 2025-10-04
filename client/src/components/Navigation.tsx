@@ -55,6 +55,7 @@ export default function Navigation() {
     { name: "Joint Ventures", path: "/joint-ventures" },
     { name: "Find a Dealer", path: "/find-dealer" },
     { name: "Buy Spares", path: "/buy-spares" },
+    { name: "Press & Media", path: "/press-media" },
   ];
 
   const vehicleModels = [
