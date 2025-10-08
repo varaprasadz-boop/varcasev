@@ -5,6 +5,7 @@ import FeaturedVehicles from "@/components/FeaturedVehicles";
 import SmartFeatures from "@/components/SmartFeatures";
 import AboutPreview from "@/components/AboutPreview";
 import EnvironmentalImpact from "@/components/EnvironmentalImpact";
+import CostCalculator from "@/components/CostCalculator";
 import Testimonials from "@/components/Testimonials";
 import PressMediaSlider from "@/components/PressMediaSlider";
 import DealerCTA from "@/components/DealerCTA";
@@ -20,6 +21,7 @@ export default function Home() {
       <SmartFeatures />
       <AboutPreview />
       <EnvironmentalImpact />
+      <CostCalculator />
       <Testimonials />
       <PressMediaSlider />
       <DealerCTA />
