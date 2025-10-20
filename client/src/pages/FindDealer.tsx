@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import FAQCTA from "@/components/FAQCTA";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -425,6 +426,7 @@ export default function FindDealer() {
         </div>
       </section>
 
+      <FAQCTA />
       <Footer />
     </div>
   );

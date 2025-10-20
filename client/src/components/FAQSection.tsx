@@ -76,17 +76,18 @@ export default function FAQSection() {
         </div>
 
         <div className="text-center">
-          <Link href="/faq">
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="gap-2"
-              data-testid="button-view-all-faqs"
-            >
+          <Button 
+            size="lg" 
+            variant="outline"
+            className="gap-2"
+            asChild
+            data-testid="button-view-all-faqs"
+          >
+            <Link href="/faq">
               View All FAQs
               <ArrowRight className="w-4 h-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

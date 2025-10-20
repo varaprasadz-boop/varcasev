@@ -1,5 +1,6 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import FAQCTA from "@/components/FAQCTA";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Battery, Zap, Wrench, Cog, Shield, CircuitBoard, ExternalLink } from "lucide-react";
@@ -153,6 +154,7 @@ export default function BuySpares() {
         </div>
       </section>
 
+      <FAQCTA />
       <Footer />
     </div>
   );

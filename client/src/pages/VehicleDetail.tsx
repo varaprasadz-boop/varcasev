@@ -3,6 +3,7 @@ import { useRoute } from "wouter";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import EnquiryDialog from "@/components/EnquiryDialog";
+import FAQCTA from "@/components/FAQCTA";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -224,6 +225,7 @@ export default function VehicleDetail() {
         </div>
       </section>
 
+      <FAQCTA />
       <Footer />
     </div>
   );

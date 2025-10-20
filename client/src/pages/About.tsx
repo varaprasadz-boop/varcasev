@@ -1,5 +1,6 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import FAQCTA from "@/components/FAQCTA";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Award, Users, Globe, Target } from "lucide-react";
@@ -331,6 +332,7 @@ export default function About() {
         </div>
       </section>
 
+      <FAQCTA />
       <Footer />
     </div>
   );

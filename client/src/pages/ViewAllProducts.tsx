@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import FAQCTA from "@/components/FAQCTA";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -214,6 +215,7 @@ export default function ViewAllProducts() {
         </div>
       </section>
 
+      <FAQCTA />
       <Footer />
     </div>
   );
