@@ -12,6 +12,7 @@ import FindDealer from "@/pages/FindDealer";
 import BuySpares from "@/pages/BuySpares";
 import Careers from "@/pages/Careers";
 import PressMedia from "@/pages/PressMedia";
+import FAQ from "@/pages/FAQ";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/buy-spares" component={BuySpares} />
       <Route path="/careers" component={Careers} />
       <Route path="/press-media" component={PressMedia} />
+      <Route path="/faq" component={FAQ} />
       <Route component={NotFound} />
     </Switch>
   );

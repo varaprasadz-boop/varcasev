@@ -34,28 +34,33 @@ export default function Footer() {
             <h3 className="font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/about">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">About Us</span>
+                <Link href="/about" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  About Us
                 </Link>
               </li>
               <li>
-                <Link href="/joint-ventures">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">Joint Ventures</span>
+                <Link href="/joint-ventures" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  Joint Ventures
                 </Link>
               </li>
               <li>
-                <Link href="/find-dealer">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">Find a Dealer</span>
+                <Link href="/find-dealer" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  Find a Dealer
                 </Link>
               </li>
               <li>
-                <Link href="/buy-spares">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">Buy Spares</span>
+                <Link href="/buy-spares" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  Buy Spares
                 </Link>
               </li>
               <li>
-                <Link href="/careers">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">Careers</span>
+                <Link href="/careers" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-muted-foreground hover:text-primary cursor-pointer" data-testid="link-footer-faq">
+                  FAQ
                 </Link>
               </li>
             </ul>
@@ -65,23 +70,23 @@ export default function Footer() {
             <h3 className="font-semibold mb-4">Our Models</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/vehicle/falcon">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">FALCON</span>
+                <Link href="/vehicle/falcon" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  FALCON
                 </Link>
               </li>
               <li>
-                <Link href="/vehicle/eagan">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">EAGAN</span>
+                <Link href="/vehicle/eagan" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  EAGAN
                 </Link>
               </li>
               <li>
-                <Link href="/vehicle/crony">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">CRONY</span>
+                <Link href="/vehicle/crony" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  CRONY
                 </Link>
               </li>
               <li>
-                <Link href="/vehicle/aman">
-                  <span className="text-muted-foreground hover:text-primary cursor-pointer">AMAN</span>
+                <Link href="/vehicle/aman" className="text-muted-foreground hover:text-primary cursor-pointer">
+                  AMAN
                 </Link>
               </li>
             </ul>

@@ -8,6 +8,7 @@ import EnvironmentalImpact from "@/components/EnvironmentalImpact";
 import CostCalculator from "@/components/CostCalculator";
 import Testimonials from "@/components/Testimonials";
 import PressMediaSlider from "@/components/PressMediaSlider";
+import FAQSection from "@/components/FAQSection";
 import DealerCTA from "@/components/DealerCTA";
 import Footer from "@/components/Footer";
 
@@ -24,6 +25,7 @@ export default function Home() {
       <CostCalculator />
       <Testimonials />
       <PressMediaSlider />
+      <FAQSection />
       <DealerCTA />
       <Footer />
     </div>
