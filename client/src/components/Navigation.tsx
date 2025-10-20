@@ -8,17 +8,33 @@ import varcasLogo from "@assets/varcasev_1759475493203.png";
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [productsDropdownOpen, setProductsDropdownOpen] = useState(false);
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [activeSubSubmenu, setActiveSubSubmenu] = useState<string | null>(null);
   const [location] = useLocation();
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const submenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Mobile accordion states
+  const [mobileScootersOpen, setMobileScootersOpen] = useState(false);
+  const [mobileMotorcyclesOpen, setMobileMotorcyclesOpen] = useState(false);
+  const [mobileCargoOpen, setMobileCargoOpen] = useState(false);
+  const [mobileThreeWheelersOpen, setMobileThreeWheelersOpen] = useState(false);
+  const [mobileFourWheelersOpen, setMobileFourWheelersOpen] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setProductsDropdownOpen(false);
+        setActiveSubmenu(null);
+        setActiveSubSubmenu(null);
         if (closeTimeoutRef.current) {
           clearTimeout(closeTimeoutRef.current);
           closeTimeoutRef.current = null;
+        }
+        if (submenuTimeoutRef.current) {
+          clearTimeout(submenuTimeoutRef.current);
+          submenuTimeoutRef.current = null;
         }
       }
     };
@@ -31,6 +47,9 @@ export default function Navigation() {
       document.removeEventListener("mousedown", handleClickOutside);
       if (closeTimeoutRef.current) {
         clearTimeout(closeTimeoutRef.current);
+      }
+      if (submenuTimeoutRef.current) {
+        clearTimeout(submenuTimeoutRef.current);
       }
     };
   }, [productsDropdownOpen]);
@@ -46,7 +65,59 @@ export default function Navigation() {
   const handleMouseLeave = () => {
     closeTimeoutRef.current = setTimeout(() => {
       setProductsDropdownOpen(false);
-    }, 3000);
+      setActiveSubmenu(null);
+      setActiveSubSubmenu(null);
+    }, 300);
+  };
+
+  const handleProductsClick = () => {
+    setProductsDropdownOpen(!productsDropdownOpen);
+    if (!productsDropdownOpen) {
+      setActiveSubmenu(null);
+      setActiveSubSubmenu(null);
+    }
+  };
+
+  const handleSubmenuEnter = (submenu: string) => {
+    if (submenuTimeoutRef.current) {
+      clearTimeout(submenuTimeoutRef.current);
+      submenuTimeoutRef.current = null;
+    }
+    setActiveSubmenu(submenu);
+    setActiveSubSubmenu(null);
+  };
+
+  const handleSubmenuLeave = () => {
+    submenuTimeoutRef.current = setTimeout(() => {
+      setActiveSubmenu(null);
+      setActiveSubSubmenu(null);
+    }, 200);
+  };
+
+  const handleSubSubmenuEnter = (subSubmenu: string) => {
+    if (submenuTimeoutRef.current) {
+      clearTimeout(submenuTimeoutRef.current);
+      submenuTimeoutRef.current = null;
+    }
+    setActiveSubSubmenu(subSubmenu);
+  };
+
+  const handleSubmenuClick = (submenu: string) => {
+    if (activeSubmenu === submenu) {
+      setActiveSubmenu(null);
+      setActiveSubSubmenu(null);
+    } else {
+      setActiveSubmenu(submenu);
+      setActiveSubSubmenu(null);
+    }
+  };
+
+  const handleSubSubmenuClick = (subSubmenu: string) => {
+    if (activeSubSubmenu === subSubmenu) {
+      setActiveSubSubmenu(null);
+    } else {
+      setActiveSubSubmenu(subSubmenu);
+    }
   };
 
   const navigationLinks = [
@@ -122,87 +193,198 @@ export default function Navigation() {
               onMouseLeave={handleMouseLeave}
             >
               <button
+                onClick={handleProductsClick}
+                onFocus={handleMouseEnter}
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
                 data-testid="button-products-dropdown"
+                aria-haspopup="true"
+                aria-expanded={productsDropdownOpen}
               >
                 Products
                 <ChevronDown className="w-4 h-4" />
               </button>
               
               {productsDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-popover border border-popover-border rounded-md shadow-lg py-2">
-                  <Link href="/products">
-                    <span className="block px-4 py-2 text-sm font-semibold text-primary hover:bg-accent cursor-pointer">
-                      View All Products
-                    </span>
+                <div className="absolute top-full left-0 mt-2 w-64 bg-popover border border-border rounded-md shadow-lg py-2">
+                  <Link href="/products" className="block px-4 py-2 text-sm font-semibold text-primary hover:bg-accent cursor-pointer" data-testid="link-view-all-products">
+                    View All Products
                   </Link>
                   
-                  <div className="border-t border-popover-border my-2"></div>
+                  <div className="border-t border-border my-2"></div>
                   
-                  <div className="px-4 py-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Electric Scooters</p>
-                    <div className="space-y-1">
-                      {electricScooters.map((model) => (
-                        <Link key={model.path} href={model.path}>
-                          <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
-                            {model.name}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t border-popover-border my-2"></div>
-
-                  <div className="px-4 py-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Electric Motorcycles</p>
-                    <div className="space-y-1">
-                      {electricMotorcycles.map((model) => (
-                        <Link key={model.path} href={model.path}>
-                          <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
-                            {model.name}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t border-popover-border my-2"></div>
-
-                  <div className="px-4 py-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Cargo & Commercial EVs</p>
+                  {/* Electric Scooters */}
+                  <div
+                    className="relative"
+                    onMouseEnter={() => handleSubmenuEnter('scooters')}
+                    onMouseLeave={handleSubmenuLeave}
+                  >
+                    <button
+                      onClick={() => handleSubmenuClick('scooters')}
+                      onFocus={() => handleSubmenuEnter('scooters')}
+                      className="w-full px-4 py-2 text-sm text-popover-foreground hover:bg-accent flex items-center justify-between text-left"
+                      data-testid="menu-electric-scooters"
+                      aria-haspopup="true"
+                      aria-expanded={activeSubmenu === 'scooters'}
+                    >
+                      <span>Electric Scooters</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                     
-                    <div className="mb-3">
-                      <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                        <ChevronRight className="w-3 h-3" />
-                        Three-Wheelers
-                      </p>
-                      <div className="space-y-1 ml-4">
-                        {threeWheelers.map((model) => (
-                          <Link key={model.path} href={model.path}>
-                            <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
-                              {model.name}
-                            </span>
+                    {activeSubmenu === 'scooters' && (
+                      <div 
+                        className="absolute left-full top-0 ml-1 w-56 bg-popover border border-border rounded-md shadow-lg py-2"
+                        onMouseEnter={() => handleSubmenuEnter('scooters')}
+                        onMouseLeave={handleSubmenuLeave}
+                      >
+                        {electricScooters.map((model) => (
+                          <Link 
+                            key={model.path} 
+                            href={model.path}
+                            className="block px-4 py-2 text-sm text-popover-foreground hover:bg-accent cursor-pointer" 
+                            data-testid={`link-${model.path.split('/').pop()}`}
+                          >
+                            {model.name}
                           </Link>
                         ))}
                       </div>
-                    </div>
+                    )}
+                  </div>
 
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                        <ChevronRight className="w-3 h-3" />
-                        Four-Wheelers
-                      </p>
-                      <div className="space-y-1 ml-4">
-                        {fourWheelers.map((model) => (
-                          <Link key={model.path} href={model.path}>
-                            <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
-                              {model.name}
-                            </span>
+                  {/* Electric Motorcycles */}
+                  <div
+                    className="relative"
+                    onMouseEnter={() => handleSubmenuEnter('motorcycles')}
+                    onMouseLeave={handleSubmenuLeave}
+                  >
+                    <button
+                      onClick={() => handleSubmenuClick('motorcycles')}
+                      onFocus={() => handleSubmenuEnter('motorcycles')}
+                      className="w-full px-4 py-2 text-sm text-popover-foreground hover:bg-accent flex items-center justify-between text-left"
+                      data-testid="menu-electric-motorcycles"
+                      aria-haspopup="true"
+                      aria-expanded={activeSubmenu === 'motorcycles'}
+                    >
+                      <span>Electric Motorcycles</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    
+                    {activeSubmenu === 'motorcycles' && (
+                      <div 
+                        className="absolute left-full top-0 ml-1 w-56 bg-popover border border-border rounded-md shadow-lg py-2"
+                        onMouseEnter={() => handleSubmenuEnter('motorcycles')}
+                        onMouseLeave={handleSubmenuLeave}
+                      >
+                        {electricMotorcycles.map((model) => (
+                          <Link 
+                            key={model.path} 
+                            href={model.path}
+                            className="block px-4 py-2 text-sm text-popover-foreground hover:bg-accent cursor-pointer" 
+                            data-testid={`link-${model.path.split('/').pop()}`}
+                          >
+                            {model.name}
                           </Link>
                         ))}
                       </div>
-                    </div>
+                    )}
+                  </div>
+
+                  {/* Cargo & Commercial EVs */}
+                  <div
+                    className="relative"
+                    onMouseEnter={() => handleSubmenuEnter('cargo')}
+                    onMouseLeave={handleSubmenuLeave}
+                  >
+                    <button
+                      onClick={() => handleSubmenuClick('cargo')}
+                      onFocus={() => handleSubmenuEnter('cargo')}
+                      className="w-full px-4 py-2 text-sm text-popover-foreground hover:bg-accent flex items-center justify-between text-left"
+                      data-testid="menu-cargo-commercial"
+                      aria-haspopup="true"
+                      aria-expanded={activeSubmenu === 'cargo'}
+                    >
+                      <span>Cargo & Commercial EVs</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    
+                    {activeSubmenu === 'cargo' && (
+                      <div 
+                        className="absolute left-full top-0 ml-1 w-56 bg-popover border border-border rounded-md shadow-lg py-2"
+                        onMouseEnter={() => handleSubmenuEnter('cargo')}
+                        onMouseLeave={handleSubmenuLeave}
+                      >
+                        {/* Three-Wheelers */}
+                        <div
+                          className="relative"
+                          onMouseEnter={() => handleSubSubmenuEnter('three-wheelers')}
+                        >
+                          <button
+                            onClick={() => handleSubSubmenuClick('three-wheelers')}
+                            onFocus={() => handleSubSubmenuEnter('three-wheelers')}
+                            className="w-full px-4 py-2 text-sm text-popover-foreground hover:bg-accent flex items-center justify-between text-left"
+                            data-testid="menu-three-wheelers"
+                            aria-haspopup="true"
+                            aria-expanded={activeSubSubmenu === 'three-wheelers'}
+                          >
+                            <span>Three-Wheelers</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                          
+                          {activeSubSubmenu === 'three-wheelers' && (
+                            <div 
+                              className="absolute left-full top-0 ml-1 w-56 bg-popover border border-border rounded-md shadow-lg py-2"
+                              onMouseEnter={() => handleSubSubmenuEnter('three-wheelers')}
+                            >
+                              {threeWheelers.map((model) => (
+                                <Link 
+                                  key={model.path} 
+                                  href={model.path}
+                                  className="block px-4 py-2 text-sm text-popover-foreground hover:bg-accent cursor-pointer" 
+                                  data-testid={`link-${model.path.split('/').pop()}`}
+                                >
+                                  {model.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Four-Wheelers */}
+                        <div
+                          className="relative"
+                          onMouseEnter={() => handleSubSubmenuEnter('four-wheelers')}
+                        >
+                          <button
+                            onClick={() => handleSubSubmenuClick('four-wheelers')}
+                            onFocus={() => handleSubSubmenuEnter('four-wheelers')}
+                            className="w-full px-4 py-2 text-sm text-popover-foreground hover:bg-accent flex items-center justify-between text-left"
+                            data-testid="menu-four-wheelers"
+                            aria-haspopup="true"
+                            aria-expanded={activeSubSubmenu === 'four-wheelers'}
+                          >
+                            <span>Four-Wheelers</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                          
+                          {activeSubSubmenu === 'four-wheelers' && (
+                            <div 
+                              className="absolute left-full top-0 ml-1 w-56 bg-popover border border-border rounded-md shadow-lg py-2"
+                              onMouseEnter={() => handleSubSubmenuEnter('four-wheelers')}
+                            >
+                              {fourWheelers.map((model) => (
+                                <Link 
+                                  key={model.path} 
+                                  href={model.path}
+                                  className="block px-4 py-2 text-sm text-popover-foreground hover:bg-accent cursor-pointer" 
+                                  data-testid={`link-${model.path.split('/').pop()}`}
+                                >
+                                  {model.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -259,76 +441,151 @@ export default function Navigation() {
         <div className="md:hidden border-t border-border bg-background">
           <div className="px-4 py-4 space-y-3">
             {navigationLinks.map((link) => (
-              <Link key={link.path} href={link.path}>
-                <span
-                  className={`block py-2 text-sm font-medium cursor-pointer ${
-                    location === link.path ? "text-primary" : "text-foreground"
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </span>
+              <Link 
+                key={link.path} 
+                href={link.path}
+                className={`block py-2 text-sm font-medium cursor-pointer ${
+                  location === link.path ? "text-primary" : "text-foreground"
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.name}
               </Link>
             ))}
             
             <div className="pt-2 border-t border-border">
-              <Link href="/products">
-                <span
-                  className="block py-2 text-sm font-semibold text-primary cursor-pointer"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  View All Products
-                </span>
+              <Link 
+                href="/products"
+                className="block py-2 text-sm font-semibold text-primary cursor-pointer"
+                onClick={() => setMobileMenuOpen(false)}
+                data-testid="link-mobile-view-all-products"
+              >
+                View All Products
               </Link>
 
-              <p className="text-sm font-medium text-muted-foreground mt-3 mb-2">Electric Scooters</p>
-              {electricScooters.map((model) => (
-                <Link key={model.path} href={model.path}>
-                  <span
-                    className="block py-2 pl-4 text-sm text-foreground cursor-pointer"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {model.name}
-                  </span>
-                </Link>
-              ))}
+              {/* Electric Scooters Accordion */}
+              <div className="mt-2">
+                <button
+                  onClick={() => setMobileScootersOpen(!mobileScootersOpen)}
+                  className="flex items-center justify-between w-full py-2 text-sm font-medium text-foreground"
+                  data-testid="button-mobile-scooters"
+                  aria-expanded={mobileScootersOpen}
+                >
+                  <span>Electric Scooters</span>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${mobileScootersOpen ? 'rotate-90' : ''}`} />
+                </button>
+                {mobileScootersOpen && (
+                  <div className="pl-4 space-y-1">
+                    {electricScooters.map((model) => (
+                      <Link 
+                        key={model.path} 
+                        href={model.path}
+                        className="block py-2 text-sm text-muted-foreground cursor-pointer"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {model.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-              <p className="text-sm font-medium text-muted-foreground mt-3 mb-2">Electric Motorcycles</p>
-              {electricMotorcycles.map((model) => (
-                <Link key={model.path} href={model.path}>
-                  <span
-                    className="block py-2 pl-4 text-sm text-foreground cursor-pointer"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {model.name}
-                  </span>
-                </Link>
-              ))}
+              {/* Electric Motorcycles Accordion */}
+              <div className="mt-2">
+                <button
+                  onClick={() => setMobileMotorcyclesOpen(!mobileMotorcyclesOpen)}
+                  className="flex items-center justify-between w-full py-2 text-sm font-medium text-foreground"
+                  data-testid="button-mobile-motorcycles"
+                  aria-expanded={mobileMotorcyclesOpen}
+                >
+                  <span>Electric Motorcycles</span>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${mobileMotorcyclesOpen ? 'rotate-90' : ''}`} />
+                </button>
+                {mobileMotorcyclesOpen && (
+                  <div className="pl-4 space-y-1">
+                    {electricMotorcycles.map((model) => (
+                      <Link 
+                        key={model.path} 
+                        href={model.path}
+                        className="block py-2 text-sm text-muted-foreground cursor-pointer"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {model.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-              <p className="text-sm font-medium text-muted-foreground mt-3 mb-2">Cargo & Commercial EVs</p>
-              <p className="text-xs font-medium text-muted-foreground pl-2 mb-1">Three-Wheelers</p>
-              {threeWheelers.map((model) => (
-                <Link key={model.path} href={model.path}>
-                  <span
-                    className="block py-2 pl-6 text-sm text-foreground cursor-pointer"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {model.name}
-                  </span>
-                </Link>
-              ))}
+              {/* Cargo & Commercial EVs Accordion */}
+              <div className="mt-2">
+                <button
+                  onClick={() => setMobileCargoOpen(!mobileCargoOpen)}
+                  className="flex items-center justify-between w-full py-2 text-sm font-medium text-foreground"
+                  data-testid="button-mobile-cargo"
+                  aria-expanded={mobileCargoOpen}
+                >
+                  <span>Cargo & Commercial EVs</span>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${mobileCargoOpen ? 'rotate-90' : ''}`} />
+                </button>
+                {mobileCargoOpen && (
+                  <div className="pl-4 space-y-2">
+                    {/* Three-Wheelers Sub-Accordion */}
+                    <div>
+                      <button
+                        onClick={() => setMobileThreeWheelersOpen(!mobileThreeWheelersOpen)}
+                        className="flex items-center justify-between w-full py-2 text-sm font-medium text-muted-foreground"
+                        data-testid="button-mobile-three-wheelers"
+                        aria-expanded={mobileThreeWheelersOpen}
+                      >
+                        <span>Three-Wheelers</span>
+                        <ChevronRight className={`w-3 h-3 transition-transform ${mobileThreeWheelersOpen ? 'rotate-90' : ''}`} />
+                      </button>
+                      {mobileThreeWheelersOpen && (
+                        <div className="pl-4 space-y-1">
+                          {threeWheelers.map((model) => (
+                            <Link 
+                              key={model.path} 
+                              href={model.path}
+                              className="block py-2 text-sm text-muted-foreground cursor-pointer"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              {model.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
-              <p className="text-xs font-medium text-muted-foreground pl-2 mt-2 mb-1">Four-Wheelers</p>
-              {fourWheelers.map((model) => (
-                <Link key={model.path} href={model.path}>
-                  <span
-                    className="block py-2 pl-6 text-sm text-foreground cursor-pointer"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {model.name}
-                  </span>
-                </Link>
-              ))}
+                    {/* Four-Wheelers Sub-Accordion */}
+                    <div>
+                      <button
+                        onClick={() => setMobileFourWheelersOpen(!mobileFourWheelersOpen)}
+                        className="flex items-center justify-between w-full py-2 text-sm font-medium text-muted-foreground"
+                        data-testid="button-mobile-four-wheelers"
+                        aria-expanded={mobileFourWheelersOpen}
+                      >
+                        <span>Four-Wheelers</span>
+                        <ChevronRight className={`w-3 h-3 transition-transform ${mobileFourWheelersOpen ? 'rotate-90' : ''}`} />
+                      </button>
+                      {mobileFourWheelersOpen && (
+                        <div className="pl-4 space-y-1">
+                          {fourWheelers.map((model) => (
+                            <Link 
+                              key={model.path} 
+                              href={model.path}
+                              className="block py-2 text-sm text-muted-foreground cursor-pointer"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              {model.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-4">

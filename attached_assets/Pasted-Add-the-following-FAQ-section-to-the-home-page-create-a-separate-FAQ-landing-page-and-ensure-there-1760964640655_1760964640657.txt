@@ -1,0 +1,70 @@
+Add the following FAQ section to the home page, create a separate FAQ landing page, and ensure there is a FAQ link in the footer and on all landing pages.
+
+Instructions:
+
+Add a short FAQ section on the home page titled “Frequently Asked Questions”, showing a few top questions from each category.
+
+Create a full FAQ landing page that includes all questions and answers below.
+
+Add a “FAQ” link in the footer menu that opens this FAQ landing page.
+
+Add a “Read FAQs” or “View FAQs” link on all other landing pages (for example, product or model pages) that also leads to the FAQ page.
+
+Organize the content into clear categories and make it easy to read.
+
+FAQ Content
+
+Charging & Battery
+
+How long does it take to charge the scooter?
+Around 2–3 hours for Lithium Ion batteries and 6–7 hours in case of Graphene / Lead-acid batteries.
+
+Can I charge it at home?
+Yes, the scooter comes with a portable charger compatible with regular household outlets – using a standard 5A socket.
+
+What is the battery warranty?
+3 years or 20,000 km (whichever comes first) for Lithium Ion; typically 9 months for Graphene batteries.
+
+Is fast charging available?
+Not currently, but future models may support it.
+
+Range & Performance
+
+What is the real-world range?
+Depends on battery capacity. For example, a 60V 31Ah Lithium Ion battery typically gives 60–70 km per charge (depending on terrain, rider weight, and driving conditions).
+
+What is the top speed?
+We have both low-speed and high-speed models ideal for urban and semi-rural commuting.
+
+Can I ride in the rain?
+Yes, the scooter is IP-rated for water resistance.
+
+Cost & Savings
+
+How much does it cost to charge?
+About 1.5 units of electricity – roughly less than ₹10 per full charge (based on ₹6/kWh rate).
+
+What are the maintenance costs?
+Very low—no oil changes, fewer moving parts, and only minimal servicing every 3 months (required to maintain warranty).
+
+Are there government subsidies?
+No, we don’t take government subsidies. At Varcas, we believe in ethical, transparent business practices. Even without subsidies, our scooters are priced competitively.
+
+Legal & Registration
+
+Do I need a license or registration?
+Not required for low-speed vehicles. Required for high-speed models.
+
+Is insurance mandatory?
+Optional for license-free models; mandatory for registered ones.
+
+Service & Support
+
+Where can I get it serviced?
+At any authorized Varcas service center or via doorstep service in select areas.
+
+What does the warranty cover?
+Battery, motor, and controller. Physical damage and water ingress are excluded.
+
+Are spare parts available?
+Yes, through Varcas dealers, company stores, website, and service partners.
