@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EnquiryDialog from "@/components/EnquiryDialog";
 import varcasLogo from "@assets/varcasev_1759475493203.png";
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [modelsDropdownOpen, setModelsDropdownOpen] = useState(false);
+  const [productsDropdownOpen, setProductsDropdownOpen] = useState(false);
   const [location] = useLocation();
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -15,7 +15,7 @@ export default function Navigation() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setModelsDropdownOpen(false);
+        setProductsDropdownOpen(false);
         if (closeTimeoutRef.current) {
           clearTimeout(closeTimeoutRef.current);
           closeTimeoutRef.current = null;
@@ -23,7 +23,7 @@ export default function Navigation() {
       }
     };
 
-    if (modelsDropdownOpen) {
+    if (productsDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
@@ -33,19 +33,19 @@ export default function Navigation() {
         clearTimeout(closeTimeoutRef.current);
       }
     };
-  }, [modelsDropdownOpen]);
+  }, [productsDropdownOpen]);
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
-    setModelsDropdownOpen(true);
+    setProductsDropdownOpen(true);
   };
 
   const handleMouseLeave = () => {
     closeTimeoutRef.current = setTimeout(() => {
-      setModelsDropdownOpen(false);
+      setProductsDropdownOpen(false);
     }, 3000);
   };
 
@@ -58,7 +58,7 @@ export default function Navigation() {
     { name: "Press & Media", path: "/press-media" },
   ];
 
-  const vehicleModels = [
+  const electricScooters = [
     { name: "FALCON", path: "/vehicle/falcon" },
     { name: "EAGAN", path: "/vehicle/eagan" },
     { name: "CRONY", path: "/vehicle/crony" },
@@ -67,6 +67,22 @@ export default function Navigation() {
     { name: "TEJAS-SPORT", path: "/vehicle/tejas-sport" },
     { name: "RANI-EX", path: "/vehicle/rani-ex" },
     { name: "RANI-LX", path: "/vehicle/rani-lx" },
+  ];
+
+  const electricMotorcycles = [
+    { name: "THUNDER 350", path: "/vehicle/thunder-350" },
+    { name: "VOLT SPORT", path: "/vehicle/volt-sport" },
+    { name: "CRUISER PRO", path: "/vehicle/cruiser-pro" },
+  ];
+
+  const threeWheelers = [
+    { name: "CARGO LITE", path: "/vehicle/cargo-lite" },
+    { name: "CARGO MAX", path: "/vehicle/cargo-max" },
+  ];
+
+  const fourWheelers = [
+    { name: "TRANSPORTER CITY", path: "/vehicle/transporter-city" },
+    { name: "TRANSPORTER CARGO", path: "/vehicle/transporter-cargo" },
   ];
 
   return (
@@ -107,21 +123,87 @@ export default function Navigation() {
             >
               <button
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors flex items-center gap-1"
-                data-testid="button-models-dropdown"
+                data-testid="button-products-dropdown"
               >
-                Models
+                Products
                 <ChevronDown className="w-4 h-4" />
               </button>
               
-              {modelsDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-popover border border-popover-border rounded-md shadow-lg py-2">
-                  {vehicleModels.map((model) => (
-                    <Link key={model.path} href={model.path}>
-                      <span className="block px-4 py-2 text-sm text-popover-foreground hover:bg-accent cursor-pointer">
-                        {model.name}
-                      </span>
-                    </Link>
-                  ))}
+              {productsDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-80 bg-popover border border-popover-border rounded-md shadow-lg py-2">
+                  <Link href="/products">
+                    <span className="block px-4 py-2 text-sm font-semibold text-primary hover:bg-accent cursor-pointer">
+                      View All Products
+                    </span>
+                  </Link>
+                  
+                  <div className="border-t border-popover-border my-2"></div>
+                  
+                  <div className="px-4 py-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Electric Scooters</p>
+                    <div className="space-y-1">
+                      {electricScooters.map((model) => (
+                        <Link key={model.path} href={model.path}>
+                          <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
+                            {model.name}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="border-t border-popover-border my-2"></div>
+
+                  <div className="px-4 py-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Electric Motorcycles</p>
+                    <div className="space-y-1">
+                      {electricMotorcycles.map((model) => (
+                        <Link key={model.path} href={model.path}>
+                          <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
+                            {model.name}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="border-t border-popover-border my-2"></div>
+
+                  <div className="px-4 py-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Cargo & Commercial EVs</p>
+                    
+                    <div className="mb-3">
+                      <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                        <ChevronRight className="w-3 h-3" />
+                        Three-Wheelers
+                      </p>
+                      <div className="space-y-1 ml-4">
+                        {threeWheelers.map((model) => (
+                          <Link key={model.path} href={model.path}>
+                            <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
+                              {model.name}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                        <ChevronRight className="w-3 h-3" />
+                        Four-Wheelers
+                      </p>
+                      <div className="space-y-1 ml-4">
+                        {fourWheelers.map((model) => (
+                          <Link key={model.path} href={model.path}>
+                            <span className="block px-2 py-1 text-sm text-popover-foreground hover:bg-accent rounded-sm cursor-pointer">
+                              {model.name}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -190,11 +272,57 @@ export default function Navigation() {
             ))}
             
             <div className="pt-2 border-t border-border">
-              <p className="text-sm font-medium text-muted-foreground mb-2">Models</p>
-              {vehicleModels.map((model) => (
+              <Link href="/products">
+                <span
+                  className="block py-2 text-sm font-semibold text-primary cursor-pointer"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  View All Products
+                </span>
+              </Link>
+
+              <p className="text-sm font-medium text-muted-foreground mt-3 mb-2">Electric Scooters</p>
+              {electricScooters.map((model) => (
                 <Link key={model.path} href={model.path}>
                   <span
                     className="block py-2 pl-4 text-sm text-foreground cursor-pointer"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {model.name}
+                  </span>
+                </Link>
+              ))}
+
+              <p className="text-sm font-medium text-muted-foreground mt-3 mb-2">Electric Motorcycles</p>
+              {electricMotorcycles.map((model) => (
+                <Link key={model.path} href={model.path}>
+                  <span
+                    className="block py-2 pl-4 text-sm text-foreground cursor-pointer"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {model.name}
+                  </span>
+                </Link>
+              ))}
+
+              <p className="text-sm font-medium text-muted-foreground mt-3 mb-2">Cargo & Commercial EVs</p>
+              <p className="text-xs font-medium text-muted-foreground pl-2 mb-1">Three-Wheelers</p>
+              {threeWheelers.map((model) => (
+                <Link key={model.path} href={model.path}>
+                  <span
+                    className="block py-2 pl-6 text-sm text-foreground cursor-pointer"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {model.name}
+                  </span>
+                </Link>
+              ))}
+
+              <p className="text-xs font-medium text-muted-foreground pl-2 mt-2 mb-1">Four-Wheelers</p>
+              {fourWheelers.map((model) => (
+                <Link key={model.path} href={model.path}>
+                  <span
+                    className="block py-2 pl-6 text-sm text-foreground cursor-pointer"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {model.name}
