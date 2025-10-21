@@ -405,7 +405,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/testimonials/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const testimonial = await storage.updateTestimonial(parseInt(id), req.body);
+      // Explicitly set updatedAt, excluding any timestamp fields from request
+      const { createdAt, updatedAt, ...cleanBody } = req.body;
+      const testimonialData = { 
+        ...cleanBody,
+        updatedAt: new Date()
+      };
+      const testimonial = await storage.updateTestimonial(parseInt(id), testimonialData);
       
       if (!testimonial) {
         return res.status(404).json({ error: "Testimonial not found" });
@@ -469,7 +475,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/stats/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const stat = await storage.updateStat(parseInt(id), req.body);
+      // Explicitly set updatedAt, excluding any timestamp fields from request
+      const { createdAt, updatedAt, ...cleanBody } = req.body;
+      const statData = { 
+        ...cleanBody,
+        updatedAt: new Date()
+      };
+      const stat = await storage.updateStat(parseInt(id), statData);
       
       if (!stat) {
         return res.status(404).json({ error: "Stat not found" });
@@ -759,7 +771,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/press-articles/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const article = await storage.updatePressArticle(parseInt(id), req.body);
+      // Explicitly set updatedAt, excluding any timestamp fields from request
+      const { createdAt, updatedAt, createdBy, ...cleanBody } = req.body;
+      const articleData = { 
+        ...cleanBody,
+        updatedAt: new Date()
+      };
+      const article = await storage.updatePressArticle(parseInt(id), articleData);
       
       if (!article) {
         return res.status(404).json({ error: "Press article not found" });
@@ -832,7 +850,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/job-openings/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const job = await storage.updateJobOpening(parseInt(id), req.body);
+      // Explicitly set updatedAt, excluding any timestamp fields from request
+      const { createdAt, updatedAt, postedDate, createdBy, ...cleanBody } = req.body;
+      const jobData = { 
+        ...cleanBody,
+        updatedAt: new Date()
+      };
+      const job = await storage.updateJobOpening(parseInt(id), jobData);
       
       if (!job) {
         return res.status(404).json({ error: "Job opening not found" });
@@ -1031,7 +1055,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/dealers/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const dealer = await storage.updateDealer(parseInt(id), req.body);
+      // Explicitly set updatedAt, excluding any timestamp fields from request
+      const { createdAt, updatedAt, createdBy, ...cleanBody } = req.body;
+      const dealerData = { 
+        ...cleanBody,
+        updatedAt: new Date()
+      };
+      const dealer = await storage.updateDealer(parseInt(id), dealerData);
       
       if (!dealer) {
         return res.status(404).json({ error: "Dealer not found" });
