@@ -263,7 +263,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/vehicles/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const vehicleData = { ...req.body, updatedBy: req.session.userId };
+      // Explicitly set updatedAt and updatedBy, excluding any timestamp fields from request
+      const { createdAt, updatedAt, createdBy, ...cleanBody } = req.body;
+      const vehicleData = { 
+        ...cleanBody, 
+        updatedBy: req.session.userId,
+        updatedAt: new Date()
+      };
       const vehicle = await storage.updateVehicle(parseInt(id), vehicleData);
       
       if (!vehicle) {
