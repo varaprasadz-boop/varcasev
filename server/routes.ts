@@ -335,7 +335,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/hero-slides/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const slide = await storage.updateHeroSlide(parseInt(id), req.body);
+      // Explicitly set updatedAt, excluding any timestamp fields from request
+      const { createdAt, updatedAt, ...cleanBody } = req.body;
+      const slideData = { 
+        ...cleanBody,
+        updatedAt: new Date()
+      };
+      const slide = await storage.updateHeroSlide(parseInt(id), slideData);
       
       if (!slide) {
         return res.status(404).json({ error: "Hero slide not found" });
