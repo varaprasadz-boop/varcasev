@@ -33,10 +33,10 @@ const iconMap: Record<string, LucideIcon> = {
 
 interface Stat {
   id: number;
-  title: string;
+  label: string;
   value: string;
   icon: string;
-  order: number;
+  displayOrder: number;
 }
 
 export default function StatsSection() {
@@ -47,8 +47,8 @@ export default function StatsSection() {
   const stats = apiStats && apiStats.length > 0
     ? apiStats.map(stat => ({
         icon: stat.icon || "Users",
-        value: stat.value,
-        label: stat.title,
+        value: stat.value || "0",
+        label: stat.label || "Stat",
       }))
     : fallbackStats;
 
@@ -62,7 +62,7 @@ export default function StatsSection() {
               <div
                 key={index}
                 className="text-center"
-                data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}
+                data-testid={`stat-${(stat.label || 'stat').toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <Icon className="w-10 h-10 mx-auto mb-3 text-primary" />
                 <div className="text-3xl md:text-4xl font-bold text-foreground font-[Space_Grotesk] mb-2">
