@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import heroImage1 from "@assets/Gemini_Generated_Image_4jzcos4jzcos4jzc_1759490673763.png";
 import heroImage2 from "@assets/Gemini_Generated_Image_qk9odzqk9odzqk9o_1759490673764.png";
 import heroImage3 from "@assets/Gemini_Generated_Image_w9nnm2w9nnm2w9nn_1759490673764.png";
 
-const heroSlides = [
+const fallbackSlides = [
   {
     image: heroImage1,
     title: "Smart & Connected",
@@ -31,15 +32,46 @@ const heroSlides = [
   },
 ];
 
+interface HeroSlide {
+  id: number;
+  title: string;
+  subtitle?: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  ctaText?: string;
+  ctaLink?: string;
+}
+
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const { data: apiSlides } = useQuery<HeroSlide[]>({
+    queryKey: ["/api/hero-slides"],
+  });
+
+  const heroSlides = apiSlides && apiSlides.length > 0 
+    ? apiSlides.map(slide => ({
+        image: slide.imageUrl,
+        title: slide.title,
+        subtitle: slide.subtitle,
+        type: (slide.videoUrl ? "video" : "image") as "video" | "image",
+        ctaText: slide.ctaText,
+        ctaLink: slide.ctaLink,
+        videoUrl: slide.videoUrl,
+      }))
+    : fallbackSlides;
+
+  // Reset currentSlide when heroSlides changes to prevent out-of-bounds
+  useEffect(() => {
+    setCurrentSlide((prev) => prev >= heroSlides.length ? 0 : prev);
+  }, [heroSlides.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [heroSlides.length]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);

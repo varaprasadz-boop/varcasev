@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import TestimonialCard from "./TestimonialCard";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -6,7 +7,7 @@ import customer1 from "@assets/stock_images/happy_customer_portr_4a379b91.jpg";
 import customer2 from "@assets/stock_images/happy_customer_portr_9a0c17fa.jpg";
 import customer3 from "@assets/stock_images/happy_customer_portr_d1a74b8f.jpg";
 
-const testimonials = [
+const fallbackTestimonials = [
   {
     quote: "Varcas e-bikes have revolutionized my daily commute! The sleek design, long-lasting battery, and smooth ride make every journey effortless. I'm proud to be a Varcas e-bike owner!",
     name: "Karthik Reddy",
@@ -27,8 +28,30 @@ const testimonials = [
   },
 ];
 
+interface Testimonial {
+  id: number;
+  customerName: string;
+  customerLocation: string;
+  customerImage?: string;
+  rating: number;
+  testimonialText: string;
+}
+
 export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const { data: apiTestimonials } = useQuery<Testimonial[]>({
+    queryKey: ["/api/testimonials"],
+  });
+
+  const testimonials = apiTestimonials && apiTestimonials.length > 0
+    ? apiTestimonials.map((t, index) => ({
+        quote: t.testimonialText,
+        name: t.customerName,
+        location: t.customerLocation,
+        image: t.customerImage || fallbackTestimonials[index % fallbackTestimonials.length].image,
+      }))
+    : fallbackTestimonials;
 
   const next = () => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);

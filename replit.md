@@ -37,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 - CSS custom properties for theming (HSL color space)
 - Consistent spacing scale and typography system
 
-**Data Organization**: Static vehicle data and press articles stored in TypeScript files (`vehicleData.ts`, `pressMediaData.ts`) rather than fetched from backend - suitable for relatively static product catalog.
+**Data Organization**: Frontend components updated to fetch data from PostgreSQL database via REST API. Key components (HeroSection, StatsSection, Testimonials) use React Query for data fetching with fallback to static data. Admin can manage all content through the CMS.
 
 ### Backend Architecture
 
@@ -45,27 +45,53 @@ Preferred communication style: Simple, everyday language.
 
 **Development Setup**: Vite middleware integration for hot module replacement (HMR) during development. The server conditionally loads Vite in development mode for seamless client-side development experience.
 
-**API Structure**: RESTful design with `/api` prefix for all application routes (currently minimal - only basic user operations defined in schema).
+**API Structure**: Comprehensive RESTful API with `/api` prefix. Includes:
+- Public routes: vehicles, hero-slides, testimonials, stats, press articles, job openings, dealers, FAQ
+- Admin routes: Full CRUD operations for all content types, protected by authentication middleware
+- Authentication: Session-based auth using express-session with MemoryStore
 
-**Storage Layer**: Abstracted through an `IStorage` interface with two implementations:
-- `MemStorage`: In-memory storage for development/testing
-- Future: Database-backed storage via Drizzle ORM
+**Storage Layer**: `DatabaseStorage` class implementing full CRUD operations for all 16 content areas:
+- Vehicles (with colors, specifications, smart features)
+- Hero slides, testimonials, stats
+- Company info, team members, values
+- Press articles, job openings
+- Dealers, joint ventures, strategic partners
+- FAQ categories and questions
+- Form submissions
+- Site settings and SEO metadata
 
-**Rationale**: The interface-based approach allows easy swapping between storage implementations without changing business logic. Current implementation uses in-memory storage, but the schema and Drizzle configuration are prepared for PostgreSQL migration.
+**Authentication**: 
+- Session middleware configured with express-session and MemoryStore
+- Bcrypt password hashing (10 rounds)
+- Role-based access control (super_admin, admin, content_manager, etc.)
+- Protected routes with requireAuth and requireAdmin middleware
 
 ### Database Design
 
 **ORM**: Drizzle ORM - type-safe TypeScript ORM with minimal runtime overhead.
 
-**Schema Definition**: Co-located in `shared/schema.ts` for type sharing between frontend and backend:
-- Users table with UUID primary keys, username, and password fields
+**Schema Definition**: Comprehensive schema in `shared/schema.ts` covering 16 major content areas:
+- Users (with roles and authentication)
+- Vehicles (with colors, specifications, smart features relationships)
+- Content: hero slides, testimonials, stats, environmental impacts
+- Company: info, values, team members
+- Press & media, job openings, FAQ
+- Dealers, joint ventures, strategic partners
+- Form submissions with response tracking
+- Site settings and SEO metadata
+- All tables have automatic updatedAt triggers ($onUpdate(() => sql`now()`))
 - Zod schemas generated from Drizzle tables for runtime validation
 
 **Migration Strategy**: Drizzle Kit for schema migrations with output to `./migrations` directory.
 
-**Database Provider**: Configured for PostgreSQL via Neon serverless driver (`@neondatabase/serverless`).
+**Database Provider**: PostgreSQL via Neon serverless driver (`@neondatabase/serverless`).
 
-**Current State**: Schema defined but storage layer uses in-memory implementation. Database is provisioned (based on env var check) but not actively used in current routes.
+**Current State**: 
+- Database fully operational with comprehensive schema
+- Seeded with admin user (username: admin, password: admin123)
+- DatabaseStorage class handles all CRUD operations
+- API routes serve data to frontend
+- Admin CMS fully functional for content management
 
 ### Design System
 
@@ -98,7 +124,13 @@ Preferred communication style: Simple, everyday language.
 - Partnership applications (`PartnershipDialog`)
 - Job applications (`JobApplicationDialog`)
 
-**Content Management**: Static content approach with data files rather than CMS - appropriate for a product catalog that doesn't change frequently.
+**Content Management System**: Full-featured admin CMS with:
+- Authentication (login/logout with session management)
+- Protected admin routes requiring authentication
+- Dashboard with content overview
+- Form submissions viewer with response capability
+- Ready for expansion to manage all content types (vehicles, press, jobs, dealers, etc.)
+- All management operations go through authenticated API routes
 
 ## External Dependencies
 
