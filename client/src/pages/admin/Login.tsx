@@ -17,7 +17,7 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
 
   if (isAuthenticated) {
-    setLocation("/admin/dashboard");
+    setLocation("/admin");
     return null;
   }
 
@@ -31,7 +31,7 @@ export default function AdminLogin() {
         title: "Login successful",
         description: "Welcome to VARCAS Admin Panel",
       });
-      setLocation("/admin/dashboard");
+      setLocation("/admin");
     } catch (error: any) {
       toast({
         title: "Login failed",

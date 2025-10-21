@@ -18,7 +18,16 @@ import FAQ from "@/pages/FAQ";
 import AdminLogin from "@/pages/admin/Login";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import FormSubmissions from "@/pages/admin/FormSubmissions";
+import VehiclesManagement from "@/pages/admin/VehiclesManagement";
+import HeroSlidesManagement from "@/pages/admin/HeroSlidesManagement";
+import StatsManagement from "@/pages/admin/StatsManagement";
+import TestimonialsManagement from "@/pages/admin/TestimonialsManagement";
+import PressManagement from "@/pages/admin/PressManagement";
+import JobsManagement from "@/pages/admin/JobsManagement";
+import DealersManagement from "@/pages/admin/DealersManagement";
+import FAQManagement from "@/pages/admin/FAQManagement";
 import NotFound from "@/pages/not-found";
+import AdminLayout from "@/layouts/AdminLayout";
 
 function Router() {
   return (
@@ -37,14 +46,74 @@ function Router() {
       
       {/* Admin routes */}
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/dashboard">
+      <Route path="/admin">
         <ProtectedRoute>
-          <AdminDashboard />
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/vehicles">
+        <ProtectedRoute>
+          <AdminLayout>
+            <VehiclesManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/hero-slides">
+        <ProtectedRoute>
+          <AdminLayout>
+            <HeroSlidesManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/stats">
+        <ProtectedRoute>
+          <AdminLayout>
+            <StatsManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/testimonials">
+        <ProtectedRoute>
+          <AdminLayout>
+            <TestimonialsManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/press">
+        <ProtectedRoute>
+          <AdminLayout>
+            <PressManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/jobs">
+        <ProtectedRoute>
+          <AdminLayout>
+            <JobsManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/dealers">
+        <ProtectedRoute>
+          <AdminLayout>
+            <DealersManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/faq">
+        <ProtectedRoute>
+          <AdminLayout>
+            <FAQManagement />
+          </AdminLayout>
         </ProtectedRoute>
       </Route>
       <Route path="/admin/forms">
         <ProtectedRoute>
-          <FormSubmissions />
+          <AdminLayout>
+            <FormSubmissions />
+          </AdminLayout>
         </ProtectedRoute>
       </Route>
       
