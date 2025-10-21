@@ -170,6 +170,11 @@ Preferred communication style: Simple, everyday language.
 ### Asset Management
 - Custom alias for attached assets (`@assets`) pointing to `attached_assets` directory
 - Stock images and brand assets stored in repository
+- **Object Storage Integration**: Replit Object Storage configured for vehicle image uploads
+  - Protected file uploading with admin authentication
+  - Presigned URLs for direct-to-cloud uploads via Uppy
+  - ACL policies for public vehicle images accessible to all authenticated users
+  - Files served via `/objects/` endpoint with authentication check
 
 ### Future Considerations
 - Session management via `connect-pg-simple` (included but not actively used)

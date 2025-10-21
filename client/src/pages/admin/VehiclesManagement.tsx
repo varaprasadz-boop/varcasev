@@ -12,10 +12,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Vehicle } from "@shared/schema";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 
 const vehicleFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -338,13 +340,47 @@ export default function VehiclesManagement() {
                   name="mainImage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Main Image URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://..." {...field} data-testid="input-main-image" />
-                      </FormControl>
-                      <FormDescription>
-                        URL to the main product image
-                      </FormDescription>
+                      <FormLabel>Main Image</FormLabel>
+                      <div className="space-y-3">
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input placeholder="Image URL or upload..." {...field} data-testid="input-main-image" />
+                          </FormControl>
+                          <ObjectUploader
+                            maxNumberOfFiles={1}
+                            maxFileSize={5242880}
+                            allowedFileTypes={['image/*']}
+                            buttonVariant="outline"
+                            onGetUploadParameters={async () => {
+                              const response = await apiRequest("POST", "/api/objects/upload", {});
+                              return {
+                                method: 'PUT' as const,
+                                url: response.uploadURL,
+                              };
+                            }}
+                            onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+                              if (result.successful && result.successful.length > 0) {
+                                const uploadedFile = result.successful[0];
+                                const uploadURL = uploadedFile.uploadURL;
+                                if (uploadURL) {
+                                  const normalizedPath = uploadURL.split('?')[0].replace('https://storage.googleapis.com', '');
+                                  const objectPath = normalizedPath.replace(/-private\/uploads/, '/objects/uploads');
+                                  field.onChange(objectPath);
+                                  toast({
+                                    title: "Success",
+                                    description: "Image uploaded successfully",
+                                  });
+                                }
+                              }
+                            }}
+                          >
+                            <Upload className="h-4 w-4" />
+                          </ObjectUploader>
+                        </div>
+                        <FormDescription>
+                          Recommended size: 1200x800px (3:2 ratio) | Max size: 5MB | Upload image or enter URL
+                        </FormDescription>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -355,13 +391,47 @@ export default function VehiclesManagement() {
                   name="frontImage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Front Image URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://..." {...field} data-testid="input-front-image" />
-                      </FormControl>
-                      <FormDescription>
-                        URL to the front-view image
-                      </FormDescription>
+                      <FormLabel>Front Image</FormLabel>
+                      <div className="space-y-3">
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input placeholder="Image URL or upload..." {...field} data-testid="input-front-image" />
+                          </FormControl>
+                          <ObjectUploader
+                            maxNumberOfFiles={1}
+                            maxFileSize={5242880}
+                            allowedFileTypes={['image/*']}
+                            buttonVariant="outline"
+                            onGetUploadParameters={async () => {
+                              const response = await apiRequest("POST", "/api/objects/upload", {});
+                              return {
+                                method: 'PUT' as const,
+                                url: response.uploadURL,
+                              };
+                            }}
+                            onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+                              if (result.successful && result.successful.length > 0) {
+                                const uploadedFile = result.successful[0];
+                                const uploadURL = uploadedFile.uploadURL;
+                                if (uploadURL) {
+                                  const normalizedPath = uploadURL.split('?')[0].replace('https://storage.googleapis.com', '');
+                                  const objectPath = normalizedPath.replace(/-private\/uploads/, '/objects/uploads');
+                                  field.onChange(objectPath);
+                                  toast({
+                                    title: "Success",
+                                    description: "Image uploaded successfully",
+                                  });
+                                }
+                              }
+                            }}
+                          >
+                            <Upload className="h-4 w-4" />
+                          </ObjectUploader>
+                        </div>
+                        <FormDescription>
+                          Recommended size: 1200x800px (3:2 ratio) | Max size: 5MB | Upload image or enter URL
+                        </FormDescription>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

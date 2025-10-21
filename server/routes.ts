@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import session from "express-session";
 
 // Extend Express Session to include user
@@ -1253,6 +1254,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete SEO metadata error:", error);
       return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // ==================== OBJECT STORAGE ROUTES ====================
+  // From blueprint:javascript_object_storage for vehicle image upload
+  
+  // Get upload URL for vehicle images (protected)
+  app.post("/api/objects/upload", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      return res.json({ uploadURL });
+    } catch (error) {
+      console.error("Get upload URL error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Serve uploaded vehicle images (protected)
+  app.get("/objects/:objectPath(*)", requireAuth, async (req: Request, res: Response) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const userId = req.session.userId;
+      
+      // Check if user can access (for now, all authenticated users can view vehicle images)
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+      });
+      
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      
+      await objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Object access error:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 
