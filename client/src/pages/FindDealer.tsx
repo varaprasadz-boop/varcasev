@@ -237,9 +237,9 @@ const dealers = [
 ];
 
 export default function FindDealer() {
-  const [selectedState, setSelectedState] = useState<string>("");
-  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedState, setSelectedState] = useState<string>("ALL");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("ALL");
+  const [selectedCity, setSelectedCity] = useState<string>("ALL");
 
   const states = useMemo(() => {
     const uniqueStates = Array.from(new Set(dealers.map(d => d.state))).sort();
@@ -247,7 +247,11 @@ export default function FindDealer() {
   }, []);
 
   const districts = useMemo(() => {
-    if (!selectedState) return [];
+    if (!selectedState || selectedState === "ALL") {
+      // Show all districts from all states
+      const uniqueDistricts = Array.from(new Set(dealers.map(d => d.district))).sort();
+      return uniqueDistricts;
+    }
     const uniqueDistricts = Array.from(
       new Set(dealers.filter(d => d.state === selectedState).map(d => d.district))
     ).sort();
@@ -255,11 +259,25 @@ export default function FindDealer() {
   }, [selectedState]);
 
   const cities = useMemo(() => {
-    if (!selectedDistrict) return [];
+    if (!selectedDistrict || selectedDistrict === "ALL") {
+      // Show all cities based on state filter
+      if (!selectedState || selectedState === "ALL") {
+        const uniqueCities = Array.from(new Set(dealers.map(d => d.city))).sort();
+        return uniqueCities;
+      }
+      const uniqueCities = Array.from(
+        new Set(dealers.filter(d => d.state === selectedState).map(d => d.city))
+      ).sort();
+      return uniqueCities;
+    }
     const uniqueCities = Array.from(
       new Set(
         dealers
-          .filter(d => d.state === selectedState && d.district === selectedDistrict)
+          .filter(d => {
+            if (selectedState && selectedState !== "ALL" && d.state !== selectedState) return false;
+            if (d.district !== selectedDistrict) return false;
+            return true;
+          })
           .map(d => d.city)
       )
     ).sort();
@@ -268,22 +286,22 @@ export default function FindDealer() {
 
   const filteredDealers = useMemo(() => {
     return dealers.filter(dealer => {
-      if (selectedState && dealer.state !== selectedState) return false;
-      if (selectedDistrict && dealer.district !== selectedDistrict) return false;
-      if (selectedCity && dealer.city !== selectedCity) return false;
+      if (selectedState && selectedState !== "ALL" && dealer.state !== selectedState) return false;
+      if (selectedDistrict && selectedDistrict !== "ALL" && dealer.district !== selectedDistrict) return false;
+      if (selectedCity && selectedCity !== "ALL" && dealer.city !== selectedCity) return false;
       return true;
     });
   }, [selectedState, selectedDistrict, selectedCity]);
 
   const handleStateChange = (value: string) => {
     setSelectedState(value);
-    setSelectedDistrict("");
-    setSelectedCity("");
+    setSelectedDistrict("ALL");
+    setSelectedCity("ALL");
   };
 
   const handleDistrictChange = (value: string) => {
     setSelectedDistrict(value);
-    setSelectedCity("");
+    setSelectedCity("ALL");
   };
 
   return (
@@ -310,6 +328,7 @@ export default function FindDealer() {
                     <SelectValue placeholder="Select State" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="ALL">All States</SelectItem>
                     {states.map((state) => (
                       <SelectItem key={state} value={state}>
                         {state}
@@ -323,12 +342,12 @@ export default function FindDealer() {
                 <Select
                   value={selectedDistrict}
                   onValueChange={handleDistrictChange}
-                  disabled={!selectedState}
                 >
                   <SelectTrigger data-testid="select-district">
                     <SelectValue placeholder="Select District" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="ALL">All Districts</SelectItem>
                     {districts.map((district) => (
                       <SelectItem key={district} value={district}>
                         {district}
@@ -342,12 +361,12 @@ export default function FindDealer() {
                 <Select
                   value={selectedCity}
                   onValueChange={setSelectedCity}
-                  disabled={!selectedDistrict}
                 >
                   <SelectTrigger data-testid="select-city">
                     <SelectValue placeholder="Select City" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="ALL">All Cities</SelectItem>
                     {cities.map((city) => (
                       <SelectItem key={city} value={city}>
                         {city}

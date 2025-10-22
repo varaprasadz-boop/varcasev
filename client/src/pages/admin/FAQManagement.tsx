@@ -36,16 +36,16 @@ interface FaqQuestion {
 
 const categoryFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  displayOrder: z.number().int().min(0).optional(),
+  displayOrder: z.coerce.number().int().min(0).optional(),
 });
 
 const questionFormSchema = z.object({
-  categoryId: z.number({
+  categoryId: z.coerce.number({
     required_error: "Category is required",
   }),
   question: z.string().min(5, "Question must be at least 5 characters"),
   answer: z.string().min(10, "Answer must be at least 10 characters"),
-  displayOrder: z.number().int().min(0).optional(),
+  displayOrder: z.coerce.number().int().min(0).optional(),
   status: z.enum(["published", "draft"]).optional(),
   tags: z.string().optional(),
 });

@@ -26,7 +26,7 @@ const statsFormSchema = z.object({
   value: z.string().min(1, "Value is required"),
   label: z.string().min(1, "Label is required"),
   icon: z.string().min(1, "Icon is required"),
-  displayOrder: z.number().int().min(0).optional(),
+  displayOrder: z.coerce.number().int().min(0).optional(),
 });
 
 type StatsFormData = z.infer<typeof statsFormSchema>;

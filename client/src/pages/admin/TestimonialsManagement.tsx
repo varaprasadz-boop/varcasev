@@ -33,7 +33,7 @@ const testimonialsFormSchema = z.object({
   customerName: z.string().min(1, "Customer name is required"),
   location: z.string().min(1, "Location is required"),
   image: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  displayOrder: z.number().int().min(0).optional(),
+  displayOrder: z.coerce.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
 });
 

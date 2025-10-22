@@ -41,7 +41,7 @@ const pressArticleFormSchema = z.object({
   fullContent: z.string().optional(),
   externalLink: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   status: z.enum(["published", "draft"]).optional(),
-  displayOrder: z.number().int().min(0).optional(),
+  displayOrder: z.coerce.number().int().min(0).optional(),
 });
 
 type PressArticleFormData = z.infer<typeof pressArticleFormSchema>;
