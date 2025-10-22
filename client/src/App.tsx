@@ -58,6 +58,13 @@ function Router() {
           </AdminLayout>
         </ProtectedRoute>
       </Route>
+      <Route path="/admin/dashboard">
+        <ProtectedRoute>
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
       <Route path="/admin/vehicles">
         <ProtectedRoute>
           <AdminLayout>
