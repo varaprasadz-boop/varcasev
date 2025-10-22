@@ -43,6 +43,16 @@ export default function DynamicPage() {
         }
         metaDesc.setAttribute('content', page.metaDescription);
       }
+      
+      if (page.keywords) {
+        let metaKeywords = document.querySelector('meta[name="keywords"]');
+        if (!metaKeywords) {
+          metaKeywords = document.createElement('meta');
+          metaKeywords.setAttribute('name', 'keywords');
+          document.head.appendChild(metaKeywords);
+        }
+        metaKeywords.setAttribute('content', page.keywords);
+      }
     }
   }, [page]);
 
@@ -121,9 +131,10 @@ function OneColumnLayout({ page }: { page: DynamicPageData }) {
 }
 
 function TwoColumnLayout({ page }: { page: DynamicPageData }) {
-  const halfContent = Math.floor(page.content.length / 2);
-  const leftContent = page.content.substring(0, halfContent);
-  const rightContent = page.content.substring(halfContent);
+  const paragraphs = page.content.split('\n\n').filter(p => p.trim());
+  const midPoint = Math.ceil(paragraphs.length / 2);
+  const leftContent = paragraphs.slice(0, midPoint).join('\n\n');
+  const rightContent = paragraphs.slice(midPoint).join('\n\n');
 
   return (
     <section className="py-16 md:py-24">
