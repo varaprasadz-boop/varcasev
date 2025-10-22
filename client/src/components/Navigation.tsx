@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EnquiryDialog from "@/components/EnquiryDialog";
@@ -120,6 +121,14 @@ export default function Navigation() {
     }
   };
 
+  const { data: dynamicPages = [] } = useQuery<any[]>({
+    queryKey: ["/api/dynamic-pages"],
+  });
+
+  const headerPages = dynamicPages.filter(
+    (page) => page.placement === "header" || page.placement === "both"
+  );
+
   const navigationLinks = [
     { name: "Home", path: "/" },
     { name: "About Us", path: "/about" },
@@ -127,6 +136,10 @@ export default function Navigation() {
     { name: "Find a Dealer", path: "/find-dealer" },
     { name: "Buy Spares", path: "/buy-spares" },
     { name: "Press & Media", path: "/press-media" },
+    ...headerPages.map((page) => ({
+      name: page.title,
+      path: `/page/${page.slug}`,
+    })),
   ];
 
   const electricScooters = [

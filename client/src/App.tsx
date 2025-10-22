@@ -15,6 +15,7 @@ import BuySpares from "@/pages/BuySpares";
 import Careers from "@/pages/Careers";
 import PressMedia from "@/pages/PressMedia";
 import FAQ from "@/pages/FAQ";
+import DynamicPage from "@/pages/DynamicPage";
 import AdminLogin from "@/pages/admin/Login";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import FormSubmissions from "@/pages/admin/FormSubmissions";
@@ -44,6 +45,9 @@ function Router() {
       <Route path="/careers" component={Careers} />
       <Route path="/press-media" component={PressMedia} />
       <Route path="/faq" component={FAQ} />
+      
+      {/* Dynamic pages */}
+      <Route path="/page/:slug" component={DynamicPage} />
       
       {/* Admin routes */}
       <Route path="/admin/login" component={AdminLogin} />

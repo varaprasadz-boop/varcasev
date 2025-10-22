@@ -1,9 +1,18 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import varcasLogo from "@assets/varcasev_1759475493203.png";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  
+  const { data: dynamicPages = [] } = useQuery<any[]>({
+    queryKey: ["/api/dynamic-pages"],
+  });
+
+  const footerPages = dynamicPages.filter(
+    (page) => page.placement === "footer" || page.placement === "both"
+  );
 
   return (
     <footer className="bg-card border-t border-card-border">
@@ -63,6 +72,13 @@ export default function Footer() {
                   FAQ
                 </Link>
               </li>
+              {footerPages.map((page) => (
+                <li key={page.id}>
+                  <Link href={`/page/${page.slug}`} className="text-muted-foreground hover:text-primary cursor-pointer">
+                    {page.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
