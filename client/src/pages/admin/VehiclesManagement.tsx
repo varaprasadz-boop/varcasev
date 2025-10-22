@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,13 +12,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Search, Edit, Trash2, Eye, Upload } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Upload, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import type { Vehicle } from "@shared/schema";
+import type { Vehicle, VehicleSpecification } from "@shared/schema";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import type { UploadResult } from "@uppy/core";
+import { Separator } from "@/components/ui/separator";
 
 const vehicleFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,6 +27,11 @@ const vehicleFormSchema = z.object({
   tagline: z.string().min(1, "Tagline is required"),
   description: z.string().min(1, "Description is required"),
   category: z.enum(["electric_scooters", "electric_motorcycles", "cargo_commercial"]),
+  keyHighlights: z.array(z.string()).optional(),
+  specifications: z.array(z.object({
+    label: z.string().min(1, "Label is required"),
+    value: z.string().min(1, "Value is required"),
+  })).optional(),
   mainImage: z.string().optional(),
   frontImage: z.string().optional(),
   status: z.enum(["active", "inactive", "coming_soon"]),
@@ -54,11 +60,23 @@ export default function VehiclesManagement() {
       tagline: "",
       description: "",
       category: "electric_scooters",
+      keyHighlights: [],
+      specifications: [],
       mainImage: "",
       frontImage: "",
       status: "active",
       displayOrder: 0,
     },
+  });
+
+  const { fields: highlightFields, append: appendHighlight, remove: removeHighlight } = useFieldArray({
+    control: form.control,
+    name: "keyHighlights" as const,
+  });
+
+  const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
+    control: form.control,
+    name: "specifications" as const,
   });
 
   const createMutation = useMutation({
@@ -137,6 +155,8 @@ export default function VehiclesManagement() {
       tagline: "",
       description: "",
       category: "electric_scooters",
+      keyHighlights: [],
+      specifications: [],
       mainImage: "",
       frontImage: "",
       status: "active",
@@ -145,19 +165,46 @@ export default function VehiclesManagement() {
     setIsDialogOpen(true);
   };
 
-  const handleEditVehicle = (vehicle: Vehicle) => {
+  const handleEditVehicle = async (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
-    form.reset({
-      name: vehicle.name,
-      slug: vehicle.slug,
-      tagline: vehicle.tagline,
-      description: vehicle.description,
-      category: vehicle.category as any,
-      mainImage: vehicle.mainImage || "",
-      frontImage: vehicle.frontImage || "",
-      status: vehicle.status as any,
-      displayOrder: vehicle.displayOrder || 0,
-    });
+    
+    // Fetch vehicle specifications from the API
+    try {
+      const specs = await apiRequest("GET", `/api/admin/vehicles/${vehicle.id}/specifications`, {});
+      
+      form.reset({
+        name: vehicle.name,
+        slug: vehicle.slug,
+        tagline: vehicle.tagline,
+        description: vehicle.description,
+        category: vehicle.category as any,
+        keyHighlights: (vehicle as any).keyHighlights || [],
+        specifications: (specs as VehicleSpecification[]).map((spec: VehicleSpecification) => ({
+          label: spec.label,
+          value: spec.value,
+        })) || [],
+        mainImage: vehicle.mainImage || "",
+        frontImage: vehicle.frontImage || "",
+        status: vehicle.status as any,
+        displayOrder: vehicle.displayOrder || 0,
+      });
+    } catch (error) {
+      // If fetching specs fails, just load vehicle without them
+      form.reset({
+        name: vehicle.name,
+        slug: vehicle.slug,
+        tagline: vehicle.tagline,
+        description: vehicle.description,
+        category: vehicle.category as any,
+        keyHighlights: (vehicle as any).keyHighlights || [],
+        specifications: [],
+        mainImage: vehicle.mainImage || "",
+        frontImage: vehicle.frontImage || "",
+        status: vehicle.status as any,
+        displayOrder: vehicle.displayOrder || 0,
+      });
+    }
+    
     setIsDialogOpen(true);
   };
 
@@ -315,6 +362,134 @@ export default function VehiclesManagement() {
                     </FormItem>
                   )}
                 />
+
+                <Separator className="my-6" />
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-semibold">Key Highlights</h4>
+                      <p className="text-xs text-muted-foreground">Add unique selling points and standout features</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => appendHighlight("")}
+                      data-testid="button-add-highlight"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Highlight
+                    </Button>
+                  </div>
+                  {highlightFields.map((field, index) => (
+                    <div key={field.id} className="flex gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`keyHighlights.${index}`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., Extended 80km range on single charge"
+                                {...field}
+                                data-testid={`input-highlight-${index}`}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeHighlight(index)}
+                        data-testid={`button-remove-highlight-${index}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  {highlightFields.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      No key highlights added yet
+                    </p>
+                  )}
+                </div>
+
+                <Separator className="my-6" />
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-semibold">Technical Specifications</h4>
+                      <p className="text-xs text-muted-foreground">Add dynamic tech specs with label-value pairs</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => appendSpec({ label: "", value: "" })}
+                      data-testid="button-add-spec"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Spec
+                    </Button>
+                  </div>
+                  {specFields.map((field, index) => (
+                    <div key={field.id} className="flex gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`specifications.${index}.label`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input
+                                placeholder="Label (e.g., Motor Power)"
+                                {...field}
+                                data-testid={`input-spec-label-${index}`}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`specifications.${index}.value`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input
+                                placeholder="Value (e.g., 1000W BLDC)"
+                                {...field}
+                                data-testid={`input-spec-value-${index}`}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeSpec(index)}
+                        data-testid={`button-remove-spec-${index}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  {specFields.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      No technical specifications added yet
+                    </p>
+                  )}
+                </div>
+
+                <Separator className="my-6" />
 
                 <FormField
                   control={form.control}

@@ -35,6 +35,7 @@ export const vehicles = pgTable("vehicles", {
   tagline: text("tagline").notNull(),
   description: text("description").notNull(),
   category: text("category").notNull(), // electric_scooters, electric_motorcycles, cargo_commercial
+  keyHighlights: text("key_highlights").array(), // Array of key feature highlights
   mainImage: text("main_image"),
   frontImage: text("front_image"),
   status: text("status").notNull().default("active"), // active, inactive, coming_soon
