@@ -120,7 +120,7 @@ export default function DynamicPagesManagement() {
 
   const createMutation = useMutation({
     mutationFn: async (data: DynamicPageFormData) => {
-      return apiRequest("/api/admin/dynamic-pages", "POST", data);
+      return apiRequest("POST", "/api/admin/dynamic-pages", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dynamic-pages"] });
@@ -142,7 +142,7 @@ export default function DynamicPagesManagement() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: DynamicPageFormData }) => {
-      return apiRequest(`/api/admin/dynamic-pages/${id}`, "PUT", data);
+      return apiRequest("PUT", `/api/admin/dynamic-pages/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dynamic-pages"] });
@@ -164,7 +164,7 @@ export default function DynamicPagesManagement() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/admin/dynamic-pages/${id}`, "DELETE");
+      return apiRequest("DELETE", `/api/admin/dynamic-pages/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/dynamic-pages"] });

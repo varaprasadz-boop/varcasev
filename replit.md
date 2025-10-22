@@ -23,6 +23,7 @@ Preferred communication style: Simple, everyday language.
 - About (`/about`)
 - Vehicle details (`/vehicle/:slug`)
 - Joint ventures, dealer finder, spare parts, careers, and press pages
+- Dynamic custom pages (`/page/:slug`)
 
 **UI Component System**: shadcn/ui (New York style variant) - a collection of re-usable Radix UI primitives with Tailwind CSS styling. Components are copied into the project rather than imported as dependencies, allowing for full customization.
 
@@ -46,11 +47,12 @@ Preferred communication style: Simple, everyday language.
 **Development Setup**: Vite middleware integration for hot module replacement (HMR) during development. The server conditionally loads Vite in development mode for seamless client-side development experience.
 
 **API Structure**: Comprehensive RESTful API with `/api` prefix. Includes:
-- Public routes: vehicles, hero-slides, testimonials, stats, press articles, job openings, dealers, FAQ
+- Public routes: vehicles, hero-slides, testimonials, stats, press articles, job openings, dealers, FAQ, dynamic-pages
 - Admin routes: Full CRUD operations for all content types, protected by authentication middleware
+- Special routes: `/api/dynamic-pages/slug/:slug` for fetching pages by slug
 - Authentication: Session-based auth using express-session with MemoryStore
 
-**Storage Layer**: `DatabaseStorage` class implementing full CRUD operations for all 16 content areas:
+**Storage Layer**: `DatabaseStorage` class implementing full CRUD operations for all 17 content areas:
 - Vehicles (with colors, specifications, smart features)
 - Hero slides, testimonials, stats
 - Company info, team members, values
@@ -59,6 +61,7 @@ Preferred communication style: Simple, everyday language.
 - FAQ categories and questions
 - Form submissions
 - Site settings and SEO metadata
+- Dynamic custom pages (with layout and placement control)
 
 **Authentication**: 
 - Session middleware configured with express-session and MemoryStore
@@ -70,7 +73,7 @@ Preferred communication style: Simple, everyday language.
 
 **ORM**: Drizzle ORM - type-safe TypeScript ORM with minimal runtime overhead.
 
-**Schema Definition**: Comprehensive schema in `shared/schema.ts` covering 16 major content areas:
+**Schema Definition**: Comprehensive schema in `shared/schema.ts` covering 17 major content areas:
 - Users (with roles and authentication)
 - Vehicles (with colors, specifications, smart features relationships)
 - Content: hero slides, testimonials, stats, environmental impacts
@@ -79,6 +82,7 @@ Preferred communication style: Simple, everyday language.
 - Dealers, joint ventures, strategic partners
 - Form submissions with response tracking
 - Site settings and SEO metadata
+- Dynamic custom pages (slug, title, content, layout, placement, SEO fields)
 - All tables have automatic updatedAt triggers ($onUpdate(() => sql`now()`))
 - Zod schemas generated from Drizzle tables for runtime validation
 
@@ -124,12 +128,25 @@ Preferred communication style: Simple, everyday language.
 - Partnership applications (`PartnershipDialog`)
 - Job applications (`JobApplicationDialog`)
 
+**Dynamic Pages Management**: Full-featured custom page creation system allowing admins to:
+- Create custom pages with unique slugs and SEO metadata (title, description, keywords)
+- Choose from four predefined layout templates:
+  - One Column: Centered, prose-styled content for articles and standard pages
+  - Two Column: Content split across two card columns (by paragraph boundaries)
+  - Hero with Content: Large hero section followed by full content
+  - Full Width: Maximum width content for wide layouts
+- Control navigation placement (header, footer, both, or none)
+- Pages automatically appear in Navigation and Footer based on placement settings
+- All content rendered with proper SEO meta tags
+- Content preserved as HTML with paragraph-based splitting for multi-column layouts
+
 **Content Management System**: Full-featured admin CMS with:
 - Authentication (login/logout with session management)
 - Protected admin routes requiring authentication
 - Dashboard with content overview
 - Form submissions viewer with response capability
-- Ready for expansion to manage all content types (vehicles, press, jobs, dealers, etc.)
+- Dynamic Pages Management with layout templates and navigation placement control
+- Complete CRUD operations for vehicles, press, jobs, dealers, hero slides, testimonials, stats, FAQ, and dynamic pages
 - All management operations go through authenticated API routes
 
 ## External Dependencies
