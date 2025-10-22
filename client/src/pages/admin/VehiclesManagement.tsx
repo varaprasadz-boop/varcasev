@@ -13,6 +13,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Plus, Search, Edit, Trash2, Eye, Upload } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Vehicle } from "@shared/schema";
@@ -36,6 +37,7 @@ type VehicleFormData = z.infer<typeof vehicleFormSchema>;
 export default function VehiclesManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const { toast } = useToast();
@@ -120,9 +122,11 @@ export default function VehiclesManagement() {
   });
 
   const filteredVehicles = vehicles?.filter(v => {
-    const matchesSearch = v.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = v.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          v.slug.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || v.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesStatus = statusFilter === "all" || v.status === statusFilter;
+    return matchesSearch && matchesCategory && matchesStatus;
   }) || [];
 
   const handleAddVehicle = () => {
@@ -491,11 +495,11 @@ export default function VehiclesManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-6 flex gap-4">
-            <div className="flex-1 relative">
+          <div className="mb-6 flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64 relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search vehicles..."
+                placeholder="Search by name or slug..."
                 className="pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -504,13 +508,24 @@ export default function VehiclesManagement() {
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-48" data-testid="select-filter-category">
-                <SelectValue placeholder="Filter by category" />
+                <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="electric_scooters">Electric Scooters</SelectItem>
                 <SelectItem value="electric_motorcycles">Electric Motorcycles</SelectItem>
                 <SelectItem value="cargo_commercial">Cargo & Commercial</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40" data-testid="select-filter-status">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="coming_soon">Coming Soon</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -522,74 +537,106 @@ export default function VehiclesManagement() {
               No vehicles found. Click "Add Vehicle" to create one.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredVehicles.map((vehicle) => (
-                <Card key={vehicle.id} className="hover-elevate" data-testid={`card-vehicle-${vehicle.id}`}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg line-clamp-1">{vehicle.name}</CardTitle>
-                        <CardDescription className="line-clamp-1">{getCategoryLabel(vehicle.category)}</CardDescription>
-                      </div>
-                      <Badge variant={getStatusColor(vehicle.status) as any}>
-                        {vehicle.status.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {vehicle.mainImage && (
-                      <div className="w-full h-32 bg-muted rounded-md overflow-hidden">
-                        <img 
-                          src={vehicle.mainImage} 
-                          alt={vehicle.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <p className="text-sm text-muted-foreground line-clamp-2">{vehicle.tagline}</p>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => handleEditVehicle(vehicle)}
-                        data-testid={`button-edit-${vehicle.id}`}
-                      >
-                        <Edit className="mr-2 h-3 w-3" />
-                        Edit
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Display Order</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredVehicles.map((vehicle, index) => (
+                    <TableRow key={vehicle.id} data-testid={`row-vehicle-${vehicle.id}`}>
+                      <TableCell className="font-medium text-muted-foreground">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          {vehicle.mainImage && (
+                            <div className="w-12 h-12 bg-muted rounded overflow-hidden flex-shrink-0">
+                              <img 
+                                src={vehicle.mainImage} 
+                                alt={vehicle.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-medium" data-testid={`text-name-${vehicle.id}`}>
+                              {vehicle.name}
+                            </div>
+                            <div className="text-sm text-muted-foreground line-clamp-1">
+                              {vehicle.tagline}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-mono text-sm text-muted-foreground">
+                        {vehicle.slug}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {getCategoryLabel(vehicle.category)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusColor(vehicle.status) as any} data-testid={`badge-status-${vehicle.id}`}>
+                          {vehicle.status.replace('_', ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {vehicle.displayOrder || 0}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
                           <Button 
-                            variant="outline" 
-                            size="sm"
-                            data-testid={`button-delete-${vehicle.id}`}
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleEditVehicle(vehicle)}
+                            data-testid={`button-edit-${vehicle.id}`}
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Edit className="h-4 w-4" />
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Vehicle</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete "{vehicle.name}"? This action cannot be undone and will also delete all associated colors, specifications, and features.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => handleDelete(vehicle.id)}
-                              data-testid="button-confirm-delete"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                data-testid={`button-delete-${vehicle.id}`}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Vehicle</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{vehicle.name}"? This action cannot be undone and will also delete all associated colors, specifications, and features.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  onClick={() => handleDelete(vehicle.id)}
+                                  data-testid="button-confirm-delete"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>
