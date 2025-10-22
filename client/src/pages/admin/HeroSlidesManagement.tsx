@@ -13,7 +13,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Edit, Trash2, Upload, MoveUp, MoveDown } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Upload } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { ObjectUploader } from "@/components/ObjectUploader";
@@ -49,6 +50,8 @@ const heroSlideFormSchema = z.object({
 type HeroSlideFormData = z.infer<typeof heroSlideFormSchema>;
 
 export default function HeroSlidesManagement() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
   const { toast } = useToast();
@@ -191,7 +194,14 @@ export default function HeroSlidesManagement() {
     deleteMutation.mutate(id);
   };
 
-  const sortedSlides = slides?.sort((a, b) => a.displayOrder - b.displayOrder) || [];
+  const sortedSlides = [...(slides ?? [])].sort((a, b) => a.displayOrder - b.displayOrder);
+
+  const filteredSlides = sortedSlides.filter(slide => {
+    const matchesSearch = slide.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          slide.subtitle.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = typeFilter === "all" || slide.type === typeFilter;
+    return matchesSearch && matchesType;
+  });
 
   return (
     <div className="space-y-6">
@@ -291,10 +301,10 @@ export default function HeroSlidesManagement() {
                               allowedFileTypes={['image/*']}
                               buttonVariant="outline"
                               onGetUploadParameters={async () => {
-                                const response = await apiRequest("POST", "/api/objects/upload", {});
+                                const { uploadURL } = await apiRequest("POST", "/api/objects/upload", {});
                                 return {
                                   method: 'PUT' as const,
-                                  url: response.uploadURL,
+                                  url: uploadURL,
                                 };
                               }}
                               onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
@@ -464,92 +474,136 @@ export default function HeroSlidesManagement() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">Loading slides...</p>
-          </CardContent>
-        </Card>
-      ) : sortedSlides.length === 0 ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">No hero slides yet. Create your first slide!</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {sortedSlides.map((slide) => (
-            <Card key={slide.id} data-testid={`slide-${slide.id}`}>
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CardTitle className="text-xl">{slide.title}</CardTitle>
-                      {!slide.isActive && (
-                        <Badge variant="secondary">Inactive</Badge>
-                      )}
-                      <Badge variant="outline">{slide.type}</Badge>
-                      <span className="text-xs text-muted-foreground">Order: {slide.displayOrder}</span>
-                    </div>
-                    <CardDescription>{slide.subtitle}</CardDescription>
-                    {slide.ctaText && (
-                      <div className="mt-2 text-sm">
-                        <span className="font-medium">CTA:</span> {slide.ctaText} 
-                        {slide.ctaLink && <span className="text-muted-foreground ml-2">→ {slide.ctaLink}</span>}
-                      </div>
-                    )}
-                    {slide.image && (
-                      <div className="mt-2 text-sm text-muted-foreground truncate">
-                        Image: {slide.image}
-                      </div>
-                    )}
-                    {slide.videoUrl && (
-                      <div className="mt-2 text-sm text-muted-foreground truncate">
-                        Video: {slide.videoUrl}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      onClick={() => handleEditSlide(slide)}
-                      data-testid={`button-edit-${slide.id}`}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          data-testid={`button-delete-${slide.id}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Hero Slide</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{slide.title}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(slide.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Hero Slides</CardTitle>
+          <CardDescription>
+            Manage homepage carousel slides
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6 flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64 relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by title or subtitle..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                data-testid="input-search"
+              />
+            </div>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-40" data-testid="select-filter-type">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="image">Image</SelectItem>
+                <SelectItem value="video">Video</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-8">Loading slides...</div>
+          ) : filteredSlides.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {sortedSlides.length === 0 ? "No hero slides yet. Create your first slide!" : "No slides match your search."}
+            </div>
+          ) : (
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Subtitle</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Order</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSlides.map((slide, index) => (
+                    <TableRow key={slide.id} data-testid={`row-slide-${slide.id}`}>
+                      <TableCell className="font-medium text-muted-foreground">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium" data-testid={`text-title-${slide.id}`}>
+                          {slide.title}
+                        </div>
+                        {slide.ctaText && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            CTA: {slide.ctaText}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="max-w-xs truncate text-sm text-muted-foreground">
+                          {slide.subtitle}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {slide.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={slide.isActive ? "default" : "secondary"}>
+                          {slide.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {slide.displayOrder}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditSlide(slide)}
+                            data-testid={`button-edit-${slide.id}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                data-testid={`button-delete-${slide.id}`}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Hero Slide</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{slide.title}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(slide.id)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

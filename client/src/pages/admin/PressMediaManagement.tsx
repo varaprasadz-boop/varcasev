@@ -12,10 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Edit, Trash2, Upload, Newspaper, ExternalLink } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Upload, ExternalLink } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 
 interface PressArticle {
   id: number;
@@ -56,6 +58,8 @@ const categories = [
 ];
 
 export default function PressMediaManagement() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<PressArticle | null>(null);
   const { toast } = useToast();
@@ -185,7 +189,14 @@ export default function PressMediaManagement() {
     deleteMutation.mutate(id);
   };
 
-  const sortedArticles = articles?.sort((a, b) => b.displayOrder - a.displayOrder) || [];
+  const sortedArticles = [...(articles ?? [])].sort((a, b) => b.displayOrder - a.displayOrder);
+
+  const filteredArticles = sortedArticles.filter(article => {
+    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          article.publication.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === "all" || article.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-6">
@@ -293,13 +304,30 @@ export default function PressMediaManagement() {
                           />
                         </FormControl>
                         <ObjectUploader
-                          onUploadComplete={(url: string) => form.setValue("image", url)}
-                          fileType="image"
-                          maxFileSizeMB={5}
+                          maxNumberOfFiles={1}
+                          maxFileSize={5242880}
+                          allowedFileTypes={['image/*']}
+                          buttonVariant="outline"
+                          onGetUploadParameters={async () => {
+                            const { uploadURL } = await apiRequest("POST", "/api/objects/upload", {});
+                            return {
+                              method: 'PUT' as const,
+                              url: uploadURL,
+                            };
+                          }}
+                          onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+                            if (result.successful && result.successful.length > 0) {
+                              const uploadedFile = result.successful[0];
+                              const uploadURL = uploadedFile.uploadURL;
+                              if (uploadURL) {
+                                const normalizedPath = uploadURL.split('?')[0].replace('https://storage.googleapis.com', '');
+                                const objectPath = normalizedPath.replace(/-private\/uploads/, '/objects/uploads');
+                                form.setValue("image", objectPath);
+                              }
+                            }
+                          }}
                         >
-                          <Button type="button" variant="outline" size="icon" data-testid="button-upload-image">
-                            <Upload className="h-4 w-4" />
-                          </Button>
+                          <Upload className="h-4 w-4" />
                         </ObjectUploader>
                       </div>
                       <FormDescription>
@@ -445,94 +473,142 @@ export default function PressMediaManagement() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">Loading press articles...</p>
-          </CardContent>
-        </Card>
-      ) : sortedArticles.length === 0 ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">No press articles yet. Create your first article!</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {sortedArticles.map((article) => (
-            <Card key={article.id} data-testid={`article-${article.id}`} className="flex flex-col">
-              {article.image && (
-                <div className="aspect-video overflow-hidden rounded-t-lg">
-                  <img 
-                    src={article.image} 
-                    alt={article.title} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <CardHeader>
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <Badge variant="secondary">{article.category}</Badge>
-                  {article.status === "draft" && (
-                    <Badge variant="outline">Draft</Badge>
-                  )}
-                </div>
-                <CardTitle className="text-lg line-clamp-2">{article.title}</CardTitle>
-                <CardDescription className="text-xs">
-                  {article.publication} • {new Date(article.publicationDate).toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{article.excerpt}</p>
-                <div className="flex items-center justify-between gap-2 mt-auto">
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      onClick={() => handleEditArticle(article)}
-                      data-testid={`button-edit-${article.id}`}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          data-testid={`button-delete-${article.id}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Press Article</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{article.title}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(article.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                  {article.externalLink && (
-                    <Button variant="ghost" size="icon" asChild>
-                      <a href={article.externalLink} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Press Articles</CardTitle>
+          <CardDescription>
+            Manage press coverage and media articles
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6 flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64 relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by title or publication..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                data-testid="input-search"
+              />
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-48" data-testid="select-filter-category">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-8">Loading press articles...</div>
+          ) : filteredArticles.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {sortedArticles.length === 0 ? "No press articles yet. Create your first article!" : "No articles match your search."}
+            </div>
+          ) : (
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Publication</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredArticles.map((article, index) => (
+                    <TableRow key={article.id} data-testid={`row-article-${article.id}`}>
+                      <TableCell className="font-medium text-muted-foreground">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium" data-testid={`text-title-${article.id}`}>
+                          {article.title}
+                        </div>
+                        {article.externalLink && (
+                          <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                            <ExternalLink className="h-3 w-3" />
+                            External link
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          {article.publication}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm text-muted-foreground">
+                          {new Date(article.publicationDate).toLocaleDateString()}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {article.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={article.status === "published" ? "default" : "secondary"}>
+                          {article.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditArticle(article)}
+                            data-testid={`button-edit-${article.id}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                data-testid={`button-delete-${article.id}`}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Press Article</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{article.title}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(article.id)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

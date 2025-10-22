@@ -159,7 +159,7 @@ export default function StatsManagement() {
     deleteMutation.mutate(id);
   };
 
-  const sortedStats = stats?.sort((a, b) => a.displayOrder - b.displayOrder) || [];
+  const sortedStats = [...(stats ?? [])].sort((a, b) => a.displayOrder - b.displayOrder);
   
   const filteredStats = sortedStats.filter(stat => {
     const matchesSearch = stat.label.toLowerCase().includes(searchTerm.toLowerCase()) ||

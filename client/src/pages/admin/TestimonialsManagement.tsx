@@ -13,10 +13,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Edit, Trash2, Upload, Quote } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Upload } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 
 interface Testimonial {
   id: number;
@@ -40,6 +42,7 @@ const testimonialsFormSchema = z.object({
 type TestimonialsFormData = z.infer<typeof testimonialsFormSchema>;
 
 export default function TestimonialsManagement() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
   const { toast } = useToast();
@@ -157,7 +160,14 @@ export default function TestimonialsManagement() {
     deleteMutation.mutate(id);
   };
 
-  const sortedTestimonials = testimonials?.sort((a, b) => a.displayOrder - b.displayOrder) || [];
+  const sortedTestimonials = [...(testimonials ?? [])].sort((a, b) => a.displayOrder - b.displayOrder);
+
+  const filteredTestimonials = sortedTestimonials.filter(testimonial => {
+    const matchesSearch = testimonial.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          testimonial.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          testimonial.quote.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
+  });
 
   const getInitials = (name: string) => {
     return name
@@ -260,13 +270,30 @@ export default function TestimonialsManagement() {
                           />
                         </FormControl>
                         <ObjectUploader
-                          onUploadComplete={(url: string) => form.setValue("image", url)}
-                          fileType="image"
-                          maxFileSizeMB={2}
+                          maxNumberOfFiles={1}
+                          maxFileSize={2097152}
+                          allowedFileTypes={['image/*']}
+                          buttonVariant="outline"
+                          onGetUploadParameters={async () => {
+                            const { uploadURL } = await apiRequest("POST", "/api/objects/upload", {});
+                            return {
+                              method: 'PUT' as const,
+                              url: uploadURL,
+                            };
+                          }}
+                          onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+                            if (result.successful && result.successful.length > 0) {
+                              const uploadedFile = result.successful[0];
+                              const uploadURL = uploadedFile.uploadURL;
+                              if (uploadURL) {
+                                const normalizedPath = uploadURL.split('?')[0].replace('https://storage.googleapis.com', '');
+                                const objectPath = normalizedPath.replace(/-private\/uploads/, '/objects/uploads');
+                                form.setValue("image", objectPath);
+                              }
+                            }
+                          }}
                         >
-                          <Button type="button" variant="outline" size="icon" data-testid="button-upload-image">
-                            <Upload className="h-4 w-4" />
-                          </Button>
+                          <Upload className="h-4 w-4" />
                         </ObjectUploader>
                       </div>
                       <FormDescription>
@@ -347,89 +374,127 @@ export default function TestimonialsManagement() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">Loading testimonials...</p>
-          </CardContent>
-        </Card>
-      ) : sortedTestimonials.length === 0 ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">No testimonials yet. Create your first testimonial!</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {sortedTestimonials.map((testimonial) => (
-            <Card key={testimonial.id} data-testid={`testimonial-${testimonial.id}`}>
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex gap-4 flex-1">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={testimonial.image || undefined} alt={testimonial.customerName} />
-                      <AvatarFallback>{getInitials(testimonial.customerName)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <CardTitle className="text-base">{testimonial.customerName}</CardTitle>
-                        {!testimonial.isActive && (
-                          <Badge variant="secondary" className="text-xs">Inactive</Badge>
-                        )}
-                      </div>
-                      <CardDescription className="text-sm">{testimonial.location}</CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      onClick={() => handleEditTestimonial(testimonial)}
-                      data-testid={`button-edit-${testimonial.id}`}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          data-testid={`button-delete-${testimonial.id}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Testimonial</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete this testimonial from {testimonial.customerName}? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(testimonial.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <Quote className="h-8 w-8 text-muted-foreground/20 absolute -top-2 -left-2" />
-                  <p className="text-muted-foreground italic pl-6">{testimonial.quote}</p>
-                </div>
-                <div className="text-xs text-muted-foreground mt-4">
-                  Display Order: {testimonial.displayOrder}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Testimonials</CardTitle>
+          <CardDescription>
+            Manage customer testimonials
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by author, location, or quote..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                data-testid="input-search"
+              />
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-8">Loading testimonials...</div>
+          ) : filteredTestimonials.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {sortedTestimonials.length === 0 ? "No testimonials yet. Create your first testimonial!" : "No testimonials match your search."}
+            </div>
+          ) : (
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Quote</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Order</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTestimonials.map((testimonial, index) => (
+                    <TableRow key={testimonial.id} data-testid={`row-testimonial-${testimonial.id}`}>
+                      <TableCell className="font-medium text-muted-foreground">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={testimonial.image || undefined} alt={testimonial.customerName} />
+                            <AvatarFallback>{getInitials(testimonial.customerName)}</AvatarFallback>
+                          </Avatar>
+                          <div className="font-medium" data-testid={`text-name-${testimonial.id}`}>
+                            {testimonial.customerName}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="max-w-md truncate text-sm text-muted-foreground">
+                          {testimonial.quote}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm text-muted-foreground">
+                          {testimonial.location}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={testimonial.isActive ? "default" : "secondary"}>
+                          {testimonial.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {testimonial.displayOrder}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditTestimonial(testimonial)}
+                            data-testid={`button-edit-${testimonial.id}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                data-testid={`button-delete-${testimonial.id}`}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Testimonial</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this testimonial from {testimonial.customerName}? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(testimonial.id)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
