@@ -82,6 +82,7 @@ export interface IStorage {
   getVehicleSpecifications(vehicleId: number): Promise<VehicleSpecification[]>;
   createVehicleSpecification(spec: any): Promise<VehicleSpecification>;
   deleteVehicleSpecification(id: number): Promise<boolean>;
+  deleteAllVehicleSpecifications(vehicleId: number): Promise<boolean>;
 
   // Vehicle Smart Features
   getVehicleSmartFeatures(vehicleId: number): Promise<VehicleSmartFeature[]>;
@@ -324,6 +325,11 @@ export class DatabaseStorage implements IStorage {
   async deleteVehicleSpecification(id: number): Promise<boolean> {
     const result = await db.delete(vehicleSpecifications).where(eq(vehicleSpecifications.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async deleteAllVehicleSpecifications(vehicleId: number): Promise<boolean> {
+    await db.delete(vehicleSpecifications).where(eq(vehicleSpecifications.vehicleId, vehicleId));
+    return true; // Return true even if no rows deleted (just means there were none)
   }
 
   // Vehicle Smart Features

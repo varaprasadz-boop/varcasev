@@ -250,10 +250,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/admin/vehicles/:id/specifications", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const specifications = await storage.getVehicleSpecifications(parseInt(id));
+      return res.json(specifications);
+    } catch (error) {
+      console.error("Get vehicle specifications error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.post("/api/admin/vehicles", requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
-      const vehicleData = { ...req.body, createdBy: req.session.userId };
-      const vehicle = await storage.createVehicle(vehicleData);
+      const { specifications, ...vehicleData } = req.body;
+      const vehicle = await storage.createVehicle({ ...vehicleData, createdBy: req.session.userId });
+      
+      // Save specifications if provided
+      if (specifications && Array.isArray(specifications) && specifications.length > 0) {
+        // Delete existing specifications first (in case of update)
+        await storage.deleteAllVehicleSpecifications(vehicle.id);
+        
+        // Create new specifications
+        for (let i = 0; i < specifications.length; i++) {
+          const spec = specifications[i];
+          if (spec.label && spec.value) {
+            await storage.createVehicleSpecification({
+              vehicleId: vehicle.id,
+              label: spec.label,
+              value: spec.value,
+              displayOrder: i,
+            });
+          }
+        }
+      }
+      
       return res.status(201).json(vehicle);
     } catch (error) {
       console.error("Create vehicle error:", error);
@@ -265,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       // Explicitly set updatedAt and updatedBy, excluding any timestamp fields from request
-      const { createdAt, updatedAt, createdBy, ...cleanBody } = req.body;
+      const { createdAt, updatedAt, createdBy, specifications, ...cleanBody } = req.body;
       const vehicleData = { 
         ...cleanBody, 
         updatedBy: req.session.userId,
@@ -275,6 +306,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!vehicle) {
         return res.status(404).json({ error: "Vehicle not found" });
+      }
+      
+      // Update specifications if provided
+      if (specifications && Array.isArray(specifications)) {
+        // Delete existing specifications
+        await storage.deleteAllVehicleSpecifications(vehicle.id);
+        
+        // Create new specifications
+        for (let i = 0; i < specifications.length; i++) {
+          const spec = specifications[i];
+          if (spec.label && spec.value) {
+            await storage.createVehicleSpecification({
+              vehicleId: vehicle.id,
+              label: spec.label,
+              value: spec.value,
+              displayOrder: i,
+            });
+          }
+        }
       }
       
       return res.json(vehicle);
