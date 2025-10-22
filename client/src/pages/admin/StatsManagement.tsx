@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Plus, Edit, Trash2, Users, TrendingUp, Award, Target, Zap, Star, ThumbsUp, Heart, CheckCircle, ShoppingCart } from "lucide-react";
+import { Plus, Edit, Trash2, Users, TrendingUp, Award, Target, Zap, Star, ThumbsUp, Heart, CheckCircle, ShoppingCart, Search } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -45,6 +47,7 @@ const iconOptions = [
 ];
 
 export default function StatsManagement() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStat, setEditingStat] = useState<Stat | null>(null);
   const { toast } = useToast();
@@ -157,6 +160,12 @@ export default function StatsManagement() {
   };
 
   const sortedStats = stats?.sort((a, b) => a.displayOrder - b.displayOrder) || [];
+  
+  const filteredStats = sortedStats.filter(stat => {
+    const matchesSearch = stat.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          stat.value.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
+  });
 
   const getIconComponent = (iconName: string) => {
     const iconOption = iconOptions.find(opt => opt.value === iconName);
@@ -288,82 +297,119 @@ export default function StatsManagement() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">Loading statistics...</p>
-          </CardContent>
-        </Card>
-      ) : sortedStats.length === 0 ? (
-        <Card>
-          <CardContent className="py-8">
-            <p className="text-center text-muted-foreground">No statistics yet. Create your first statistic!</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {sortedStats.map((stat) => {
-            const IconComponent = getIconComponent(stat.icon);
-            return (
-              <Card key={stat.id} data-testid={`stat-${stat.id}`}>
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <IconComponent className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-2xl font-bold">{stat.value}</CardTitle>
-                          <CardDescription>{stat.label}</CardDescription>
-                        </div>
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-2">
-                        Order: {stat.displayOrder} | Icon: {stat.icon}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="icon"
-                        onClick={() => handleEditStat(stat)}
-                        data-testid={`button-edit-${stat.id}`}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="icon"
-                            data-testid={`button-delete-${stat.id}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Statistic</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete "{stat.label}"? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(stat.id)}>
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Statistics</CardTitle>
+          <CardDescription>
+            Manage statistics displayed on your homepage
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by label or value..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                data-testid="input-search"
+              />
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-8">Loading statistics...</div>
+          ) : filteredStats.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {sortedStats.length === 0 ? "No statistics yet. Create your first statistic!" : "No statistics match your search."}
+            </div>
+          ) : (
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Icon</TableHead>
+                    <TableHead>Value</TableHead>
+                    <TableHead>Label</TableHead>
+                    <TableHead>Display Order</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredStats.map((stat, index) => {
+                    const IconComponent = getIconComponent(stat.icon);
+                    return (
+                      <TableRow key={stat.id} data-testid={`row-stat-${stat.id}`}>
+                        <TableCell className="font-medium text-muted-foreground">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <IconComponent className="h-4 w-4 text-primary" />
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              {stat.icon}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-semibold text-lg">{stat.value}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium">{stat.label}</div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {stat.displayOrder}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleEditStat(stat)}
+                              data-testid={`button-edit-${stat.id}`}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  data-testid={`button-delete-${stat.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Statistic</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{stat.label}"? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(stat.id)}>
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
