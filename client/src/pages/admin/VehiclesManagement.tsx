@@ -216,6 +216,8 @@ export default function VehiclesManagement() {
       tagline: formData.tagline,
       description: formData.description,
       category: formData.category,
+      keyHighlights: formData.keyHighlights,
+      specifications: formData.specifications,
       mainImage: formData.mainImage || undefined,
       frontImage: formData.frontImage || undefined,
       status: formData.status,
