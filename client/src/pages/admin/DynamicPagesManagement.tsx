@@ -39,7 +39,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, FileText, Eye, Layout } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Pencil, Trash2, FileText, Eye, Layout, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -93,6 +95,9 @@ const placementOptions = [
 
 export default function DynamicPagesManagement() {
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [placementFilter, setPlacementFilter] = useState<string>("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingPage, setEditingPage] = useState<DynamicPage | null>(null);
   const [deletingPage, setDeletingPage] = useState<DynamicPage | null>(null);
@@ -237,6 +242,14 @@ export default function DynamicPagesManagement() {
     return placementOptions.find(p => p.value === placement)?.label || placement;
   };
 
+  const filteredPages = pages.filter(page => {
+    const matchesSearch = page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          page.slug.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || page.status === statusFilter;
+    const matchesPlacement = placementFilter === "all" || page.placement === placementFilter;
+    return matchesSearch && matchesStatus && matchesPlacement;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -252,86 +265,146 @@ export default function DynamicPagesManagement() {
         </Button>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-8">Loading...</div>
-      ) : pages.length === 0 ? (
-        <Card className="p-8 text-center">
-          <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-xl font-semibold mb-2">No dynamic pages yet</h3>
-          <p className="text-muted-foreground mb-4">
-            Create your first custom page with layout options
-          </p>
-          <Button onClick={handleCreate} data-testid="button-create-first-page">
-            <Plus className="w-4 h-4 mr-2" />
-            Create First Page
-          </Button>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {pages.map((page) => (
-            <Card key={page.id} className="p-6" data-testid={`card-page-${page.id}`}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-semibold" data-testid={`text-title-${page.id}`}>
-                      {page.title}
-                    </h3>
-                    <span className={`px-2 py-1 text-xs rounded ${
-                      page.status === "published" 
-                        ? "bg-green-500/20 text-green-700 dark:text-green-400"
-                        : "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
-                    }`} data-testid={`badge-status-${page.id}`}>
-                      {page.status}
-                    </span>
-                    {!page.isActive && (
-                      <span className="px-2 py-1 text-xs rounded bg-red-500/20 text-red-700 dark:text-red-400">
-                        Inactive
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Eye className="w-4 h-4" />
-                      /{page.slug}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Layout className="w-4 h-4" />
-                      {getLayoutLabel(page.layout)}
-                    </span>
-                    <span>
-                      Navigation: <strong>{getPlacementLabel(page.placement)}</strong>
-                    </span>
-                    <span>
-                      Order: <strong>{page.displayOrder}</strong>
-                    </span>
-                  </div>
-                  <p className="text-muted-foreground line-clamp-2">
-                    {page.content.substring(0, 200)}...
+      <Card>
+        <div className="p-6">
+          <div className="mb-6 flex flex-wrap gap-4">
+            <div className="flex-1 min-w-64 relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by title or slug..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                data-testid="input-search"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40" data-testid="select-filter-status">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={placementFilter} onValueChange={setPlacementFilter}>
+              <SelectTrigger className="w-40" data-testid="select-filter-placement">
+                <SelectValue placeholder="Placement" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Placements</SelectItem>
+                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="header">Header</SelectItem>
+                <SelectItem value="footer">Footer</SelectItem>
+                <SelectItem value="both">Both</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-8">Loading...</div>
+          ) : filteredPages.length === 0 ? (
+            <div className="text-center py-8">
+              {pages.length === 0 ? (
+                <>
+                  <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold mb-2">No dynamic pages yet</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Create your first custom page with layout options
                   </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(page)}
-                    data-testid={`button-edit-${page.id}`}
-                  >
-                    <Pencil className="w-4 h-4" />
+                  <Button onClick={handleCreate} data-testid="button-create-first-page">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create First Page
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(page)}
-                    data-testid={`button-delete-${page.id}`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
+                </>
+              ) : (
+                <p className="text-muted-foreground">No pages match your filters.</p>
+              )}
+            </div>
+          ) : (
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead>Layout</TableHead>
+                    <TableHead>Placement</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Order</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPages.map((page, index) => (
+                    <TableRow key={page.id} data-testid={`row-page-${page.id}`}>
+                      <TableCell className="font-medium text-muted-foreground">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium" data-testid={`text-title-${page.id}`}>
+                          {page.title}
+                        </div>
+                        {!page.isActive && (
+                          <Badge variant="outline" className="mt-1 text-xs">
+                            Inactive
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm text-muted-foreground">
+                        /{page.slug}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {getLayoutLabel(page.layout)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {getPlacementLabel(page.placement)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={page.status === "published" ? "default" : "secondary"}
+                          data-testid={`badge-status-${page.id}`}
+                        >
+                          {page.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {page.displayOrder}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(page)}
+                            data-testid={`button-edit-${page.id}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(page)}
+                            data-testid={`button-delete-${page.id}`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
-      )}
+      </Card>
 
       <Dialog open={isCreateDialogOpen || !!editingPage} onOpenChange={(open) => {
         if (!open) {
