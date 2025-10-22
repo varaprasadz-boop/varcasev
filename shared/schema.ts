@@ -432,3 +432,33 @@ export const mediaLibrary = pgTable("media_library", {
 
 export const insertMediaLibrarySchema = createInsertSchema(mediaLibrary).omit({ id: true, uploadedAt: true });
 export type MediaLibraryItem = typeof mediaLibrary.$inferSelect;
+
+// ==================== DYNAMIC PAGES ====================
+
+export const dynamicPages = pgTable("dynamic_pages", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  layout: text("layout").notNull().default("one_column"), // one_column, two_column, hero_with_content, full_width
+  placement: text("placement").notNull().default("none"), // header, footer, both, none
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  keywords: text("keywords"),
+  status: text("status").notNull().default("draft"), // published, draft
+  displayOrder: integer("display_order").default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => sql`now()`),
+  createdBy: varchar("created_by").references(() => users.id),
+  updatedBy: varchar("updated_by").references(() => users.id),
+});
+
+export const insertDynamicPageSchema = createInsertSchema(dynamicPages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DynamicPage = typeof dynamicPages.$inferSelect;
+export type InsertDynamicPage = z.infer<typeof insertDynamicPageSchema>;

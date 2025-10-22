@@ -27,6 +27,7 @@ import {
   seoMetadata,
   formSubmissions,
   mediaLibrary,
+  dynamicPages,
 } from "@shared/schema";
 import type {
   Vehicle,
@@ -209,6 +210,14 @@ export interface IStorage {
   createMediaLibraryItem(item: any): Promise<MediaLibraryType>;
   updateMediaLibraryItem(id: number, item: any): Promise<MediaLibraryType | undefined>;
   deleteMediaLibraryItem(id: number): Promise<boolean>;
+
+  // ==================== DYNAMIC PAGES ====================
+  listDynamicPages(filters?: { status?: string; placement?: string }): Promise<any[]>;
+  getDynamicPage(id: number): Promise<any | undefined>;
+  getDynamicPageBySlug(slug: string): Promise<any | undefined>;
+  createDynamicPage(page: any): Promise<any>;
+  updateDynamicPage(id: number, page: any): Promise<any | undefined>;
+  deleteDynamicPage(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -858,6 +867,54 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMediaLibraryItem(id: number): Promise<boolean> {
     const result = await db.delete(mediaLibrary).where(eq(mediaLibrary.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // ==================== DYNAMIC PAGES ====================
+  async listDynamicPages(filters?: { status?: string; placement?: string }): Promise<any[]> {
+    let query = db.select().from(dynamicPages);
+    
+    const conditions = [];
+    if (filters?.status) conditions.push(eq(dynamicPages.status, filters.status));
+    if (filters?.placement) conditions.push(eq(dynamicPages.placement, filters.placement));
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+    
+    return await query.orderBy(asc(dynamicPages.displayOrder), asc(dynamicPages.title));
+  }
+
+  async getDynamicPage(id: number): Promise<any | undefined> {
+    const result = await db.select().from(dynamicPages).where(eq(dynamicPages.id, id));
+    return result[0];
+  }
+
+  async getDynamicPageBySlug(slug: string): Promise<any | undefined> {
+    const result = await db.select().from(dynamicPages).where(eq(dynamicPages.slug, slug));
+    return result[0];
+  }
+
+  async createDynamicPage(pageData: any): Promise<any> {
+    const result = await db.insert(dynamicPages).values(pageData).returning();
+    return result[0];
+  }
+
+  async updateDynamicPage(id: number, pageData: any): Promise<any | undefined> {
+    const updateData = { ...pageData };
+    delete updateData.id;
+    delete updateData.createdAt;
+    delete updateData.updatedAt;
+    delete updateData.createdBy;
+    
+    updateData.updatedAt = new Date();
+    
+    const result = await db.update(dynamicPages).set(updateData).where(eq(dynamicPages.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteDynamicPage(id: number): Promise<boolean> {
+    const result = await db.delete(dynamicPages).where(eq(dynamicPages.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 }
