@@ -10,6 +10,7 @@ import {
   MapPin,
   HelpCircle,
   FileText,
+  FileStack,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -73,6 +74,11 @@ const menuItems = [
     title: "FAQ",
     url: "/admin/faq",
     icon: HelpCircle,
+  },
+  {
+    title: "Dynamic Pages",
+    url: "/admin/dynamic-pages",
+    icon: FileStack,
   },
   {
     title: "Form Submissions",

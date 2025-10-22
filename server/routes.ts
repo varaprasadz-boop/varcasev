@@ -1293,6 +1293,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== DYNAMIC PAGES ROUTES ====================
+  
+  // List dynamic pages (public - only published, active pages)
+  app.get("/api/dynamic-pages", async (req: Request, res: Response) => {
+    try {
+      const pages = await storage.listDynamicPages({ status: "published" });
+      const activePages = pages.filter(p => p.isActive);
+      return res.json(activePages);
+    } catch (error) {
+      console.error("List dynamic pages error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get dynamic page by slug (public)
+  app.get("/api/dynamic-pages/slug/:slug", async (req: Request, res: Response) => {
+    try {
+      const page = await storage.getDynamicPageBySlug(req.params.slug);
+      if (!page) {
+        return res.status(404).json({ error: "Page not found" });
+      }
+      if (page.status !== "published" || !page.isActive) {
+        return res.status(404).json({ error: "Page not found" });
+      }
+      return res.json(page);
+    } catch (error) {
+      console.error("Get dynamic page by slug error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // List all dynamic pages (admin)
+  app.get("/api/admin/dynamic-pages", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const pages = await storage.listDynamicPages();
+      return res.json(pages);
+    } catch (error) {
+      console.error("List all dynamic pages error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get dynamic page by ID (admin)
+  app.get("/api/admin/dynamic-pages/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const page = await storage.getDynamicPage(Number(req.params.id));
+      if (!page) {
+        return res.status(404).json({ error: "Page not found" });
+      }
+      return res.json(page);
+    } catch (error) {
+      console.error("Get dynamic page error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Create dynamic page (admin)
+  app.post("/api/admin/dynamic-pages", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const pageData = {
+        ...req.body,
+        createdBy: req.session.userId,
+        updatedBy: req.session.userId,
+      };
+      const page = await storage.createDynamicPage(pageData);
+      return res.status(201).json(page);
+    } catch (error) {
+      console.error("Create dynamic page error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Update dynamic page (admin)
+  app.put("/api/admin/dynamic-pages/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const updateData = {
+        ...req.body,
+        updatedBy: req.session.userId,
+      };
+      const page = await storage.updateDynamicPage(Number(req.params.id), updateData);
+      if (!page) {
+        return res.status(404).json({ error: "Page not found" });
+      }
+      return res.json(page);
+    } catch (error) {
+      console.error("Update dynamic page error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Delete dynamic page (admin)
+  app.delete("/api/admin/dynamic-pages/:id", requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const success = await storage.deleteDynamicPage(Number(req.params.id));
+      if (!success) {
+        return res.status(404).json({ error: "Page not found" });
+      }
+      return res.status(204).send();
+    } catch (error) {
+      console.error("Delete dynamic page error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // ==================== OBJECT STORAGE ROUTES ====================
   // From blueprint:javascript_object_storage for vehicle image upload
   

@@ -26,6 +26,7 @@ import PressManagement from "@/pages/admin/PressManagement";
 import JobsManagement from "@/pages/admin/JobsManagement";
 import DealersManagement from "@/pages/admin/DealersManagement";
 import FAQManagement from "@/pages/admin/FAQManagement";
+import DynamicPagesManagement from "@/pages/admin/DynamicPagesManagement";
 import NotFound from "@/pages/not-found";
 import AdminLayout from "@/layouts/AdminLayout";
 
@@ -106,6 +107,13 @@ function Router() {
         <ProtectedRoute>
           <AdminLayout>
             <FAQManagement />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/dynamic-pages">
+        <ProtectedRoute>
+          <AdminLayout>
+            <DynamicPagesManagement />
           </AdminLayout>
         </ProtectedRoute>
       </Route>
