@@ -72,6 +72,11 @@ export default function Footer() {
                   FAQ
                 </Link>
               </li>
+              <li>
+                <Link href="/admin/login" className="text-muted-foreground hover:text-primary cursor-pointer" data-testid="link-footer-content-manager">
+                  Content Manager
+                </Link>
+              </li>
               {footerPages.map((page) => (
                 <li key={page.id}>
                   <Link href={`/page/${page.slug}`} className="text-muted-foreground hover:text-primary cursor-pointer">
@@ -139,6 +144,9 @@ export default function Footer() {
               <a href="#" className="text-muted-foreground hover:text-primary">
                 Terms of Service
               </a>
+              <Link href="/admin/login" className="text-muted-foreground hover:text-primary cursor-pointer text-xs opacity-50 hover:opacity-100" data-testid="link-admin-login">
+                Admin
+              </Link>
             </div>
           </div>
         </div>
