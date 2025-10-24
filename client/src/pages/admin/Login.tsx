@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useState } from "react";
+import { Redirect, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,11 +18,9 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
 
   // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      setLocation("/admin");
-    }
-  }, [isAuthenticated, setLocation]);
+  if (isAuthenticated) {
+    return <Redirect to="/admin" />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
