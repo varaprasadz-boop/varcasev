@@ -129,8 +129,8 @@ export default function CostCalculator() {
     return null;
   }
 
-  const petrolCostPerDay = (dailyKm[0] / 50) * 110;
-  const electricCostPerDay = dailyKm[0] * vehicle.energyPerKm * 6;
+  const petrolCostPerDay = (dailyKm[0] / 50) * 100;
+  const electricCostPerDay = dailyKm[0] * vehicle.energyPerKm * 5;
 
   const petrolCostPerMonth = petrolCostPerDay * 30;
   const electricCostPerMonth = electricCostPerDay * 30;
@@ -208,7 +208,7 @@ export default function CostCalculator() {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">Petrol Cost</h3>
-                  <p className="text-sm text-muted-foreground">@ ₹110/liter (50 km/liter)</p>
+                  <p className="text-sm text-muted-foreground">@ ₹100/liter (50 km/liter)</p>
                 </div>
               </div>
 
@@ -235,7 +235,7 @@ export default function CostCalculator() {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">Electric Cost</h3>
-                  <p className="text-sm text-muted-foreground">@ ₹6/unit ({vehicle.name})</p>
+                  <p className="text-sm text-muted-foreground">@ ₹5/unit ({vehicle.name})</p>
                 </div>
               </div>
 
@@ -282,7 +282,7 @@ export default function CostCalculator() {
 
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            * Calculations based on average electricity cost of ₹6 per unit and petrol cost of ₹110 per liter with 50 km/liter mileage.
+            * Calculations based on average electricity cost of ₹5 per unit and petrol cost of ₹100 per liter with 50 km/liter mileage.
             For vehicles with range estimates, minimum range is used for conservative cost calculation.
           </p>
         </div>
