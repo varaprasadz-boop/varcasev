@@ -1,7 +1,7 @@
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import StatsSection from "@/components/StatsSection";
-import FeaturedVehicles from "@/components/FeaturedVehicles";
+import ProductCollections from "@/components/ProductCollections";
 import SmartFeatures from "@/components/SmartFeatures";
 import AboutPreview from "@/components/AboutPreview";
 import EnvironmentalImpact from "@/components/EnvironmentalImpact";
@@ -18,7 +18,7 @@ export default function Home() {
       <Navigation />
       <HeroSection />
       <StatsSection />
-      <FeaturedVehicles />
+      <ProductCollections />
       <SmartFeatures />
       <AboutPreview />
       <EnvironmentalImpact />
