@@ -46,6 +46,7 @@ function Router() {
       <Route path="/buy-spares" component={BuySpares} />
       <Route path="/careers" component={Careers} />
       <Route path="/press-media" component={PressMedia} />
+      <Route path="/press" component={PressMedia} />
       <Route path="/faq" component={FAQ} />
       
       {/* Dynamic pages */}
