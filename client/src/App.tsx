@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
+import Vehicles from "@/pages/Vehicles";
 import VehicleDetail from "@/pages/VehicleDetail";
 import ViewAllProducts from "@/pages/ViewAllProducts";
 import JointVentures from "@/pages/JointVentures";
@@ -37,6 +38,7 @@ function Router() {
       {/* Public routes */}
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
+      <Route path="/vehicles" component={Vehicles} />
       <Route path="/products" component={ViewAllProducts} />
       <Route path="/vehicle/:slug" component={VehicleDetail} />
       <Route path="/joint-ventures" component={JointVentures} />
