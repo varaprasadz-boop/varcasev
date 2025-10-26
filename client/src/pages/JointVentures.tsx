@@ -1,5 +1,6 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import PartnershipDialog from "@/components/PartnershipDialog";
 import FAQCTA from "@/components/FAQCTA";
 import { Card } from "@/components/ui/card";
@@ -74,6 +75,10 @@ export default function JointVentures() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+        <Breadcrumbs items={[{ label: "Joint Ventures & Partners" }]} />
+      </div>
       
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

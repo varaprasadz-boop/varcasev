@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRoute } from "wouter";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import EnquiryDialog from "@/components/EnquiryDialog";
 import FAQCTA from "@/components/FAQCTA";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,10 @@ export default function VehicleDetail() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+        <Breadcrumbs items={[{ label: "Vehicles", href: "/vehicles" }, { label: vehicle.name }]} />
+      </div>
       
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
